@@ -110,11 +110,13 @@
         WhereEnumerable.prototype.__iterator__ = function() {
             var arr = [];
 
+             var index = 0;
             for (var item in this._enumerable) {
-                if (this._fn(item)) {
+                if (this._fn(item, index)) {
                     arr.push(item);
                     yield item;
                 }
+                index++;
             }
 
             this._enumerable = new Enumerable(arr);
