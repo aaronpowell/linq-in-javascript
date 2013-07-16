@@ -1,0 +1,27 @@
+{
+  "name": "linq-in-javascript",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0",
+    "chai": "~1.7.2"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aaronpowell/linq-in-javascript"
+  },
+  "author": "Aaron Powell <me@aaron-powell.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aaronpowell/linq-in-javascript/issues"
+  }
+}
