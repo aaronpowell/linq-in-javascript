@@ -1,5 +1,5 @@
 describe('Enumerable', function () {
-        describe('.first', function () {
+    describe('.first', function () {
         it('should have a first method', function () {
             var items = [1, 2, 3].asEnumerable();
 
