@@ -69,6 +69,17 @@
         };
     };
 
+    var all = function (fn) {
+        var res = true;
+        for (let x in this) {
+            if (!fn(x)) {
+                res = false;
+            }
+        }
+
+        return res;
+    };
+
     var __iterator__ = function() {
         for (var i = 0; i < this._array.length; i++) {
             yield this._array[i]
@@ -94,6 +105,8 @@
 
     Enumerable.prototype.single = single(false, fnTrue);
     Enumerable.prototype.singleOrDefault = single(true, fnTrue);
+
+    Enumerable.prototype.all = all;
 
     Enumerable.prototype.__iterator__ = __iterator__;
     Enumerable.prototype.toArray = toArray;
@@ -149,11 +162,34 @@
         return SelectEnumerable;
     })(Enumerable);
 
+    var RangeEnumerable = (function (__super) {
+        __extends(RangeEnumerable, __super);
+
+        function RangeEnumerable(enumerable, start, end) {
+            __super.call(this, enumerable._array);
+            this._start = start;
+            this._end = end;
+        };
+        RangeEnumerable.prototype.__iterator__ = function () {
+            for (var i = this._start; i <= this._end; i++) {
+                yield i;
+            }
+        };
+
+        return RangeEnumerable;
+    })(Enumerable);
+
+    Enumerable.range = function (start, end) {
+        start = start || 0;
+        end = end || 0;
+
+        return new RangeEnumerable([], start, end);
+    }
+
     // extension methods
     Array.prototype.asEnumerable = function() {
         return new Enumerable(this);
     };
-
 
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = Enumerable;
