@@ -70,14 +70,13 @@
     };
 
     var all = function (fn) {
-        var res = true;
         for (let x in this) {
             if (!fn(x)) {
-                res = false;
+                return false;
             }
         }
 
-        return res;
+        return true;
     };
 
     var __iterator__ = function() {
