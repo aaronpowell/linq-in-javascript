@@ -8,7 +8,7 @@
         d.prototype = new __();
     };
 
-    var fnTrue = function () { return true };
+    var fnTrue = () => true;
 
 
     var Enumerable = function (array) {
@@ -79,6 +79,17 @@
         return true;
     };
 
+    var any = function (fn) {
+        fn = fn || fnTrue;
+
+        for (let x in this) {
+            if (fn(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     var count = function (fn) {
         fn = fn || fnTrue;
 
@@ -118,6 +129,7 @@
     Enumerable.prototype.singleOrDefault = single(true, fnTrue);
 
     Enumerable.prototype.all = all;
+    Enumerable.prototype.any = any;
     Enumerable.prototype.count = count;
 
     Enumerable.prototype.__iterator__ = __iterator__;
