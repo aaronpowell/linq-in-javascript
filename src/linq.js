@@ -79,6 +79,18 @@
         return true;
     };
 
+    var count = function (fn) {
+        fn = fn || fnTrue;
+
+        var count = 0;
+        for (var i in this) {
+            if (fn(i)) {
+                count++;
+            }
+        }
+        return count;
+    };
+
     var __iterator__ = function() {
         for (var i = 0; i < this._array.length; i++) {
             yield this._array[i]
@@ -106,6 +118,7 @@
     Enumerable.prototype.singleOrDefault = single(true, fnTrue);
 
     Enumerable.prototype.all = all;
+    Enumerable.prototype.count = count;
 
     Enumerable.prototype.__iterator__ = __iterator__;
     Enumerable.prototype.toArray = toArray;
