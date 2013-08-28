@@ -37,6 +37,28 @@ describe('Enumerable', function () {
                 index++;
             }
         });
+
+        it('should create a range of the expected length', function () {
+            var range = Enumerable.range(1, 2);
+
+            expect(range.toArray().length).to.equal(2);
+        });
+
+        it('should allow a select from a range', function () {
+            var range = Enumerable.range(0, 10);
+
+            var selected = range.select(x => x + 1);
+
+            expect(selected.toArray()).to.deep.equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+        });
+
+        it('should allow a take from a range', function () {
+            var range = Enumerable.range(0, 10);
+
+            var taken = range.take(1);
+
+            expect(taken.toArray()).to.deep.equal([0]);
+        });
     });
 
     describe('toArray', function () {
