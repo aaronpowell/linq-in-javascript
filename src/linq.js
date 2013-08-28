@@ -99,6 +99,23 @@
         return count;
     };
 
+    var aggregate = function (seed, fn, selector) {
+        if (!fn) {
+            fn = seed;
+            seed = undefined;
+        }
+
+        selector = selector || x => x;
+
+        if (seed == undefined) {
+
+        }
+
+        for (let item in this) {
+
+        }
+    };
+
     var where = function (fn) {
         return WhereEnumerable(this, fn);
     };
