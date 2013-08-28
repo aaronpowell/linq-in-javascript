@@ -18,14 +18,6 @@
         this._array = array;
     };
 
-    var where = function(fn) {
-        return new WhereEnumerable(this, fn);
-    };
-
-    var select = function(fn) {
-        return new SelectEnumerable(this, fn);
-    };
-
     var first = function (nullable, selector) {
         return function (fn) {
             fn = fn || selector;
@@ -100,6 +92,14 @@
             }
         }
         return count;
+    };
+
+    var where = function(fn) {
+        return new WhereEnumerable(this, fn);
+    };
+
+    var select = function(fn) {
+        return new SelectEnumerable(this, fn);
     };
 
     var take = function (count) {
