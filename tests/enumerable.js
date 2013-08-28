@@ -38,4 +38,12 @@ describe('Enumerable', function () {
             }
         });
     });
+
+    describe('toArray', function () {
+        it('should allow conversion back to an array', function () {
+            var items = [1,2,3].asEnumerable().toArray();
+
+            expect(items).isArray;
+        });
+    });
 });
