@@ -61,6 +61,26 @@ describe('Enumerable', function () {
         });
     });
 
+    describe('repeat', function () {
+        it('should allow the creation of a repeat enumerable', function () {
+            var items = Enumerable.repeat(1, 1);
+
+            expect(items).to.exist;
+        });
+
+        it('should create an enumerable of the expected length', function () {
+            var items = Enumerable.repeat(1, 1);
+
+            expect(items.toArray().length).to.equal(1);
+        });
+
+        it('should create an enumerable containing only the provided value', function () {
+            var items = Enumerable.repeat('a', 3);
+
+            expect(items.toArray()).to.deep.equal(['a', 'a', 'a']);
+        });
+    });
+
     describe('toArray', function () {
         it('should allow conversion back to an array', function () {
             var items = [1,2,3].asEnumerable().toArray();

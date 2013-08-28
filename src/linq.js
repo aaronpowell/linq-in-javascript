@@ -110,6 +110,14 @@
         return new TakeEnumerable(this, fn || 0);
     };
 
+    var skip = function (count) {
+        return new SkipEnumerable(this, count || 0);
+    };
+
+    var skipWhile = function (fn) {
+        return new SkipEnumerable(this, fn || 0);
+    };
+
     var __iterator__ = function() {
         for (var i = 0; i < this._array.length; i++) {
             yield this._array[i]
@@ -142,6 +150,9 @@
 
     Enumerable.prototype.take = take;
     Enumerable.prototype.takeWhile = takeWhile;
+
+    Enumerable.prototype.skip = skip;
+    Enumerable.prototype.skipWhile = skipWhile;
 
     Enumerable.prototype.__iterator__ = __iterator__;
     Enumerable.prototype.toArray = toArray;
@@ -248,12 +259,71 @@
         return TakeEnumerable;
     })(Enumerable);
 
+    var SkipEnumerable = (function (__super) {
+        __extends(SkipEnumerable, __super);
+
+        function SkipEnumerable(enumerable, selector) {
+            __super.call(this, enumerable._array);
+            this._enumerable = enumerable;
+            this._selector = selector;
+        }
+
+        SkipEnumerable.prototype.__iterator__ = function () {
+            var index = 0;
+            if (typeof this._selector === 'number') {
+                for (let item in this._enumerable) {
+                    if (index >= this._selector) {
+                        yield item;
+                    }
+                    index++;
+                }
+            } else if (typeof this._selector === 'function') {
+                let flag = false;
+                index = -1;
+                for (let item in this._enumerable) {
+                    index++;
+                    if (!flag && !this._selector(item, index)) {
+                        flag = true;
+                    }
+
+                    if (flag) {
+                        yield item;
+                    }
+                }
+            }
+        };
+
+        return SkipEnumerable;
+    })(Enumerable);
+
+    var RepeatEnumerable = (function (__super) {
+        __extends(RepeatEnumerable, __super);
+
+        function RepeatEnumerable(item, count) {
+            __super.call(this);
+            this._item = item;
+            this._count = count;
+        }
+
+        RepeatEnumerable.prototype.__iterator__ = function () {
+             for (var i = 0; i < this._count; i++) {
+                yield this._item;
+             }
+        };
+
+        return RepeatEnumerable;
+    })(Enumerable);
+
     Enumerable.range = function (start, end) {
         start = start || 0;
         end = end || 0;
 
         return new RangeEnumerable([], start, end);
-    }
+    };
+
+    Enumerable.repeat = function (item, count) {
+        return new RepeatEnumerable(item, count || 0);
+    };
 
     // extension methods
     Array.prototype.asEnumerable = function() {
