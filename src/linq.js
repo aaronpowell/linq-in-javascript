@@ -174,13 +174,14 @@
         SelectEnumerable.prototype.__iterator__ = function () {
             var arr = [];
 
+            var index = 0;
             for (var item in this._enumerable) {
-                let x = this._fn(item);
+                let x = this._fn(item, index++);
                 arr.push(x);
                 yield x;
             }
 
-        this._enumerable = new Enumerable(arr);
+            //this._enumerable = new Enumerable(arr);
         };
 
         return SelectEnumerable;
