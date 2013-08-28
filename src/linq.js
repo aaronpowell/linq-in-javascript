@@ -102,6 +102,14 @@
         return count;
     };
 
+    var take = function (count) {
+        return new TakeEnumerable(this, count || 0);
+    };
+
+    var takeWhile = function (fn) {
+        return new TakeEnumerable(this, fn || 0);
+    };
+
     var __iterator__ = function() {
         for (var i = 0; i < this._array.length; i++) {
             yield this._array[i]
@@ -131,6 +139,9 @@
     Enumerable.prototype.all = all;
     Enumerable.prototype.any = any;
     Enumerable.prototype.count = count;
+
+    Enumerable.prototype.take = take;
+    Enumerable.prototype.takeWhile = takeWhile;
 
     Enumerable.prototype.__iterator__ = __iterator__;
     Enumerable.prototype.toArray = toArray;
@@ -180,8 +191,6 @@
                 arr.push(x);
                 yield x;
             }
-
-            //this._enumerable = new Enumerable(arr);
         };
 
         return SelectEnumerable;
@@ -202,6 +211,41 @@
         };
 
         return RangeEnumerable;
+    })(Enumerable);
+
+    var TakeEnumerable = (function (__super) {
+        __extends(TakeEnumerable, __super);
+
+        function TakeEnumerable(enumerable, selector) {
+            __super.call(this, enumerable._array);
+            this._enumerable = enumerable;
+            this._selector = selector;
+        }
+
+        TakeEnumerable.prototype.__iterator__ = function () {
+            var index = 0;
+            if (typeof this._selector === 'number') {
+                for (let item in this._enumerable) {
+                    if (index < this._selector) {
+                        yield item;
+                        index++;
+                    } else {
+                        break;
+                    }
+                }
+            } else if (typeof this._selector === 'function') {
+                for (let item in this._enumerable) {
+                    if (this._selector(item, index)) {
+                        yield item;
+                    } else {
+                        break;
+                    }
+                    index++;
+                }
+            }
+        };
+
+        return TakeEnumerable;
     })(Enumerable);
 
     Enumerable.range = function (start, end) {
