@@ -94,12 +94,16 @@
         return count;
     };
 
-    var where = function(fn) {
+    var where = function (fn) {
         return new WhereEnumerable(this, fn);
     };
 
-    var select = function(fn) {
+    var select = function (fn) {
         return new SelectEnumerable(this, fn);
+    };
+
+    var selectMany = function (fn) {
+        return new SelectManyEnumerable(this, fn);
     };
 
     var take = function (count) {
@@ -137,6 +141,7 @@
 
     Enumerable.prototype.select = select;
     Enumerable.prototype.map = select;
+    Enumerable.prototype.selectMany = selectMany;
 
     Enumerable.prototype.first = first(false, fnTrue);
     Enumerable.prototype.firstOrDefault = first(true, fnTrue);
@@ -206,6 +211,29 @@
 
         return SelectEnumerable;
     })(Enumerable);
+
+    var SelectManyEnumerable = (function (__super) {
+        __extends(SelectManyEnumerable, __super);
+    
+        function SelectManyEnumerable(enumerable, colSelector, resultSelector) {
+            __super.call(this, enumerable, colSelector);
+            this._resultSelector = resultSelector || ((col, x) => x);
+        };
+
+        SelectManyEnumerable.prototype.__iterator__ = function () {
+            var index = 0;
+
+            for (let item in this._enumerable) {
+                let arr = this._fn(item, index++);
+                for (let i = 0; i < arr.length; i++) {
+                    let foo = this._resultSelector(arr, arr[i]);
+                    yield foo;
+                }
+            }
+        };
+
+        return SelectManyEnumerable;
+    })(SelectEnumerable);
 
     var RangeEnumerable = (function (__super) {
         __extends(RangeEnumerable, __super);

@@ -69,6 +69,16 @@ describe('Enumerable', function () {
     describe('.map', function () {
         it('should use the same function for .select and .map', function () {
             expect(Enumerable.prototype.select).to.equal(Enumerable.prototype.map);
-        })
+        });
+    });
+
+    describe('.selectMany', function () {
+        it('should collapse a simple nested array'  , function () {
+            var items = [[1], [2], [3]].asEnumerable();
+
+            var results = items.selectMany(x => x);
+
+            expect(results.toArray()).to.deep.equal([1,2,3]);
+        });
     });
 });
