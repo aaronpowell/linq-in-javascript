@@ -172,18 +172,13 @@
         };
 
         WhereEnumerable.prototype.__iterator__ = function() {
-            var arr = [];
-
-             var index = 0;
-            for (var item in this._enumerable) {
+            var index = 0;
+            for (let item in this._enumerable) {
                 if (this._fn(item, index)) {
-                    arr.push(item);
                     yield item;
                 }
                 index++;
             }
-
-            this._enumerable = new Enumerable(arr);
         };
 
         return WhereEnumerable;
@@ -199,13 +194,9 @@
         };
 
         SelectEnumerable.prototype.__iterator__ = function () {
-            var arr = [];
-
             var index = 0;
             for (var item in this._enumerable) {
-                let x = this._fn(item, index++);
-                arr.push(x);
-                yield x;
+                yield this._fn(item, index++);
             }
         };
 
