@@ -221,21 +221,18 @@
     })(SelectEnumerable);
 
     var RangeEnumerable = (function (__super) {
-        __extends(RangeEnumerable, __super);
+        return function (start, end) {
+            var ranger = function* (start, end) {
+                for (start; start <= end; start++) {
+                    yield start;
+                }
+            };
 
-        function RangeEnumerable(enumerable, start, end) {
-            __super.call(this, enumerable._array);
-            this._start = start;
-            this._end = end;
+            var instance = ranger.bind(this, start, end);
+            __extends(instance, __super);
+            return instance;
         };
-        RangeEnumerable.prototype.__iterator__ = function () {
-            for (var i = this._start; i <= this._end; i++) {
-                yield i;
-            }
-        };
-
-        return RangeEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var TakeEnumerable = (function (__super) {
         __extends(TakeEnumerable, __super);
@@ -328,7 +325,7 @@
         start = start || 0;
         end = end || 0;
 
-        return new RangeEnumerable([], start, end);
+        return RangeEnumerable(start, end);
     };
 
     Enumerable.repeat = function (item, count) {

@@ -32,7 +32,7 @@ describe('Enumerable', function () {
             var range = Enumerable.range(1, 2);
 
             var index = 1;
-            for (var x in range) {
+            for (var x in range()) {
                 expect(x).to.equal(index);
                 index++;
             }
