@@ -3,19 +3,24 @@
 
     var __extends = function (d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() { this.constructor = d; }
-        __.prototype = b.prototype;
-        d.prototype = new __();
     };
 
-    var fnTrue = () => true;
+    var fnTrue = function () { return true; };
 
+    var generator = function* (array) {
+        for (let i = 0; i < array.length; i++) {
+            yield array[i];
+        }
+    };
 
     var Enumerable = function (array) {
-        if (typeof this === 'undefined' || this.constructor !== Enumerable) {
-            return new Enumerable(array);
+        if (this && this.constructor == Enumerable) {
+            throw 'This is not a constructable type, don\'t use the `new` operator';
         }
-        this._array = array;
+        var instance = generator.bind(this, array);
+
+        __extends(instance, generator);
+        return instance
     };
 
     var first = function (nullable, selector) {
@@ -95,7 +100,7 @@
     };
 
     var where = function (fn) {
-        return new WhereEnumerable(this, fn);
+        return WhereEnumerable(this, fn);
     };
 
     var select = function (fn) {
@@ -122,12 +127,6 @@
         return new SkipEnumerable(this, fn || 0);
     };
 
-    var __iterator__ = function() {
-        for (var i = 0; i < this._array.length; i++) {
-            yield this._array[i]
-        };
-    };
-
     var toArray = function() {
         var arr = [];
         for (var i in this) {
@@ -136,53 +135,48 @@
         return arr;
     };
 
-    Enumerable.prototype.where = where;
-    Enumerable.prototype.filter = where;
+    generator.where = where;
+    generator.filter = where;
 
-    Enumerable.prototype.select = select;
-    Enumerable.prototype.map = select;
-    Enumerable.prototype.selectMany = selectMany;
+    generator.select = select;
+    generator.map = select;
+    generator.selectMany = selectMany;
 
-    Enumerable.prototype.first = first(false, fnTrue);
-    Enumerable.prototype.firstOrDefault = first(true, fnTrue);
+    generator.first = first(false, fnTrue);
+    generator.firstOrDefault = first(true, fnTrue);
 
-    Enumerable.prototype.single = single(false, fnTrue);
-    Enumerable.prototype.singleOrDefault = single(true, fnTrue);
+    generator.single = single(false, fnTrue);
+    generator.singleOrDefault = single(true, fnTrue);
 
-    Enumerable.prototype.all = all;
-    Enumerable.prototype.any = any;
-    Enumerable.prototype.count = count;
+    generator.all = all;
+    generator.any = any;
+    generator.count = count;
 
-    Enumerable.prototype.take = take;
-    Enumerable.prototype.takeWhile = takeWhile;
+    generator.take = take;
+    generator.takeWhile = takeWhile;
 
-    Enumerable.prototype.skip = skip;
-    Enumerable.prototype.skipWhile = skipWhile;
+    generator.skip = skip;
+    generator.skipWhile = skipWhile;
 
-    Enumerable.prototype.__iterator__ = __iterator__;
-    Enumerable.prototype.toArray = toArray;
+    generator.toArray = toArray;
 
     var WhereEnumerable = (function (__super) {
-        __extends(WhereEnumerable, __super);
-
-        function WhereEnumerable(enumerable, fn) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._fn = fn;
-        };
-
-        WhereEnumerable.prototype.__iterator__ = function() {
-            var index = 0;
-            for (let item in this._enumerable) {
-                if (this._fn(item, index)) {
-                    yield item;
+        return function WhereEnumerable(parent, fn) {
+            function* where(fn) {
+                var index = 0;
+                for (let x of parent()) {
+                    if (fn(x, index)) {
+                        yield x;
+                    }
+                    index++;
                 }
-                index++;
             }
-        };
 
-        return WhereEnumerable;
-    })(Enumerable);
+            var x = where.bind(this, fn);
+            __extends(x, __super);
+            return x;
+        };
+    })(generator);
 
     var SelectEnumerable = (function (__super) {
         __extends(SelectEnumerable, __super);
@@ -346,7 +340,7 @@
 
     // extension methods
     Array.prototype.asEnumerable = function() {
-        return new Enumerable(this);
+        return Enumerable(this);
     };
 
     if (typeof module === 'object' && typeof module.exports === 'object') {
