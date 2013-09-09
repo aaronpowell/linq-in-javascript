@@ -129,7 +129,7 @@
 
     var toArray = function() {
         var arr = [];
-        for (var i in this) {
+        for (let i of this()) {
             arr.push(i);
         }
         return arr;
@@ -310,22 +310,19 @@
     })(Enumerable);
 
     var RepeatEnumerable = (function (__super) {
-        __extends(RepeatEnumerable, __super);
+        return function (item, count) {
+            var repeater = function* (item, count) {
+                var stripped = JSON.stringify(item);
+                for (var i = 0; i < count; i++) {
+                    yield JSON.parse(stripped);
+                }
+            };
 
-        function RepeatEnumerable(item, count) {
-            __super.call(this);
-            this._item = item;
-            this._count = count;
-        }
-
-        RepeatEnumerable.prototype.__iterator__ = function () {
-             for (var i = 0; i < this._count; i++) {
-                yield this._item;
-             }
+            var instance = repeater.bind(this, item, count);
+            __extends(instance, __super);
+            return instance;
         };
-
-        return RepeatEnumerable;
-    })(Enumerable);
+    })(generator);
 
     Enumerable.range = function (start, end) {
         start = start || 0;
@@ -335,7 +332,7 @@
     };
 
     Enumerable.repeat = function (item, count) {
-        return new RepeatEnumerable(item, count || 0);
+        return RepeatEnumerable(item, count || 0);
     };
 
     // extension methods
