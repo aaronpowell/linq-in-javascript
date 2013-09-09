@@ -43,7 +43,7 @@
         return function (fn) {
             fn = fn || selector;
             var matched;
-            for (let item in this) {
+            for (let item in this()) {
                 if (fn(item)) {
                     if (matched) {
                         throw 'Sequence contains more than one matching element';
