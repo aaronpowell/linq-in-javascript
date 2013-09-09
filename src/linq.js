@@ -79,7 +79,7 @@
     var any = function (fn) {
         fn = fn || fnTrue;
 
-        for (let x in this) {
+        for (let x in this()) {
             if (fn(x)) {
                 return true;
             }
