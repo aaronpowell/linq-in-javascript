@@ -112,7 +112,7 @@
     };
 
     var take = function (count) {
-        return new TakeEnumerable(this, count || 0);
+        return TakeEnumerable(this, count || 0);
     };
 
     var takeWhile = function (fn) {
@@ -231,39 +231,35 @@
     })(generator);
 
     var TakeEnumerable = (function (__super) {
-        __extends(TakeEnumerable, __super);
-
-        function TakeEnumerable(enumerable, selector) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._selector = selector;
-        }
-
-        TakeEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-            if (typeof this._selector === 'number') {
-                for (let item in this._enumerable) {
-                    if (index < this._selector) {
-                        yield item;
+        return function (parent, selector) {
+            var taker = function* (parent, selector) {
+                var index = 0;
+                if (typeof selector === 'number') {
+                    for (let item of parent()) {
+                        if (index < selector) {
+                            yield item;
+                            index++;
+                        } else {
+                            break;
+                        }
+                    }
+                } else if (typeof selector === 'function') {
+                    for (let item of parent()) {
+                        if (selector(item, index)) {
+                            yield item;
+                        } else {
+                            break;
+                        }
                         index++;
-                    } else {
-                        break;
                     }
                 }
-            } else if (typeof this._selector === 'function') {
-                for (let item in this._enumerable) {
-                    if (this._selector(item, index)) {
-                        yield item;
-                    } else {
-                        break;
-                    }
-                    index++;
-                }
-            }
-        };
+            };
 
-        return TakeEnumerable;
-    })(Enumerable);
+            var instance = taker.bind(this, parent, selector);
+            __extends(instance, __super);
+            return instance;
+        };
+    })(generator);
 
     var SkipEnumerable = (function (__super) {
         __extends(SkipEnumerable, __super);
