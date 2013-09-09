@@ -67,7 +67,7 @@
     };
 
     var all = function (fn) {
-        for (let x in this) {
+        for (let x in this()) {
             if (!fn(x)) {
                 return false;
             }
