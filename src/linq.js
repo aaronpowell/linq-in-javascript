@@ -120,7 +120,7 @@
     };
 
     var skip = function (count) {
-        return new SkipEnumerable(this, count || 0);
+        return SkipEnumerable(this, count || 0);
     };
 
     var skipWhile = function (fn) {
@@ -262,41 +262,37 @@
     })(generator);
 
     var SkipEnumerable = (function (__super) {
-        __extends(SkipEnumerable, __super);
-
-        function SkipEnumerable(enumerable, selector) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._selector = selector;
-        }
-
-        SkipEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-            if (typeof this._selector === 'number') {
-                for (let item in this._enumerable) {
-                    if (index >= this._selector) {
-                        yield item;
+        return function (parent, selector) {
+            var skippy = function* (parent, selector) {
+                var index = 0;
+                if (typeof selector === 'number') {
+                    for (let item of parent()) {
+                        if (index >= selector) {
+                            yield item;
+                        }
+                        index++;
                     }
-                    index++;
-                }
-            } else if (typeof this._selector === 'function') {
-                let flag = false;
-                index = -1;
-                for (let item in this._enumerable) {
-                    index++;
-                    if (!flag && !this._selector(item, index)) {
-                        flag = true;
-                    }
+                } else if (typeof selector === 'function') {
+                    let flag = false;
+                    index = -1;
+                    for (let item of parent()) {
+                        index++;
+                        if (!flag && !selector(item, index)) {
+                            flag = true;
+                        }
 
-                    if (flag) {
-                        yield item;
+                        if (flag) {
+                            yield item;
+                        }
                     }
                 }
-            }
+            };
+
+            var instance = skippy.bind(this, parent, selector);
+            __extends(instance, __super);
+            return instance;
         };
-
-        return SkipEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var RepeatEnumerable = (function (__super) {
         return function (item, count) {
