@@ -26,7 +26,7 @@
     var first = function (nullable, selector) {
         return function (fn) {
             fn = fn || selector;
-            for (let item in this) {
+            for (let item in this()) {
                 if (fn(item)) {
                     return item;
                 }
