@@ -104,11 +104,11 @@
     };
 
     var select = function (fn) {
-        return new SelectEnumerable(this, fn);
+        return SelectEnumerable(this, fn);
     };
 
     var selectMany = function (fn) {
-        return new SelectManyEnumerable(this, fn);
+        return SelectManyEnumerable(this, fn);
     };
 
     var take = function (count) {
@@ -116,7 +116,7 @@
     };
 
     var takeWhile = function (fn) {
-        return new TakeEnumerable(this, fn || 0);
+        return TakeEnumerable(this, fn || 0);
     };
 
     var skip = function (count) {
@@ -124,7 +124,7 @@
     };
 
     var skipWhile = function (fn) {
-        return new SkipEnumerable(this, fn || 0);
+        return SkipEnumerable(this, fn || 0);
     };
 
     var toArray = function() {
@@ -194,27 +194,25 @@
     })(generator);
 
     var SelectManyEnumerable = (function (__super) {
-        __extends(SelectManyEnumerable, __super);
-    
-        function SelectManyEnumerable(enumerable, colSelector, resultSelector) {
-            __super.call(this, enumerable, colSelector);
-            this._resultSelector = resultSelector || ((col, x) => x);
-        };
+        return function (parent, colSelector, resultSelector) {
+            var selectMany = function* (parent, colSelector, resultSelector) {
+                resultSelector = resultSelector || function (col, x) { return x; };
+                var index = 0;
 
-        SelectManyEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-
-            for (let item in this._enumerable) {
-                let arr = this._fn(item, index++);
-                for (let i = 0; i < arr.length; i++) {
-                    let foo = this._resultSelector(arr, arr[i]);
-                    yield foo;
+                for (let item of parent()) {
+                    let arr = colSelector(item, index++);
+                    for (let i = 0; i < arr.length; i++) {
+                        let foo = resultSelector(arr, arr[i]);
+                        yield foo;
+                    }
                 }
-            }
-        };
+            };
 
-        return SelectManyEnumerable;
-    })(SelectEnumerable);
+            var instance = selectMany.bind(this, parent, colSelector, resultSelector);
+            __extends(instance, __super);
+            return instance;
+        };
+    })(generator);
 
     var RangeEnumerable = (function (__super) {
         return function (start, end) {
