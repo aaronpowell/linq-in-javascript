@@ -91,7 +91,7 @@
         fn = fn || fnTrue;
 
         var count = 0;
-        for (var i in this) {
+        for (var i in this()) {
             if (fn(i)) {
                 count++;
             }
@@ -179,23 +179,19 @@
     })(generator);
 
     var SelectEnumerable = (function (__super) {
-        __extends(SelectEnumerable, __super);
-    
-        function SelectEnumerable(enumerable, fn) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._fn = fn;
-        };
+        return function (parent, fn) {
+            var selector = function* (parent, fn) {
+                var index = 0;
+                for (let item of parent()) {
+                    yield fn(item, index++);
+                }
+            };
 
-        SelectEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-            for (var item in this._enumerable) {
-                yield this._fn(item, index++);
-            }
+            var instance = selector.bind(this, parent, fn);
+            __extends(instance, __super);
+            return instance;
         };
-
-        return SelectEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var SelectManyEnumerable = (function (__super) {
         __extends(SelectManyEnumerable, __super);

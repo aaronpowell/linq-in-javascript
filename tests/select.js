@@ -14,7 +14,7 @@ describe('Enumerable', function () {
             var res = enumerable.select(fn);
 
             var pos = 0;
-            for (var x in res) {
+            for (var x of res()) {
                 expect(x).to.equal(fn(arr[pos]));
                 pos++;
             }
@@ -30,7 +30,7 @@ describe('Enumerable', function () {
             var filtered = items.select(x => x());
 
             var pos = 0;
-            for (var item in filtered) {
+            for (var item of filtered()) {
                 expect(item).to.equal(true);
                 pos++;
                 break;
@@ -48,7 +48,7 @@ describe('Enumerable', function () {
                 return true;
             });
 
-            for (var item in filtered) {
+            for (var item of filtered()) {
                 //noop
             }
             expect(pos).to.equal(3);
