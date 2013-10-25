@@ -8,16 +8,10 @@ describe('Enumerable', function () {
             expect(enumerable).to.exist;
         });
 
-        it('should allow creation from a constructor', function () {
-            var enumerable = new Enumerable();
-
-            expect(enumerable).to.be.instanceOf(Enumerable);
-        });
-
         it('should allow creation without a constructor', function () {
             var enumerable = Enumerable();
 
-            expect(enumerable).to.be.instanceOf(Enumerable);
+            expect(enumerable).to.exist;
         });
     });
 
@@ -32,7 +26,7 @@ describe('Enumerable', function () {
             var range = Enumerable.range(1, 2);
 
             var index = 1;
-            for (var x in range) {
+            for (var x in range()) {
                 expect(x).to.equal(index);
                 index++;
             }

@@ -3,25 +3,30 @@
 
     var __extends = function (d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() { this.constructor = d; }
-        __.prototype = b.prototype;
-        d.prototype = new __();
     };
 
-    var fnTrue = () => true;
+    var fnTrue = function () { return true; };
 
+    var generator = function* (array) {
+        for (let i = 0; i < array.length; i++) {
+            yield array[i];
+        }
+    };
 
     var Enumerable = function (array) {
-        if (typeof this === 'undefined' || this.constructor !== Enumerable) {
-            return new Enumerable(array);
+        if (this && this.constructor == Enumerable) {
+            throw 'This is not a constructable type, don\'t use the `new` operator';
         }
-        this._array = array;
+        var instance = generator.bind(this, array);
+
+        __extends(instance, generator);
+        return instance
     };
 
     var first = function (nullable, selector) {
         return function (fn) {
             fn = fn || selector;
-            for (let item in this) {
+            for (let item in this()) {
                 if (fn(item)) {
                     return item;
                 }
@@ -38,7 +43,7 @@
         return function (fn) {
             fn = fn || selector;
             var matched;
-            for (let item in this) {
+            for (let item in this()) {
                 if (fn(item)) {
                     if (matched) {
                         throw 'Sequence contains more than one matching element';
@@ -62,7 +67,7 @@
     };
 
     var all = function (fn) {
-        for (let x in this) {
+        for (let x in this()) {
             if (!fn(x)) {
                 return false;
             }
@@ -74,7 +79,7 @@
     var any = function (fn) {
         fn = fn || fnTrue;
 
-        for (let x in this) {
+        for (let x in this()) {
             if (fn(x)) {
                 return true;
             }
@@ -86,7 +91,7 @@
         fn = fn || fnTrue;
 
         var count = 0;
-        for (var i in this) {
+        for (var i in this()) {
             if (fn(i)) {
                 count++;
             }
@@ -95,267 +100,227 @@
     };
 
     var where = function (fn) {
-        return new WhereEnumerable(this, fn);
+        return WhereEnumerable(this, fn);
     };
 
     var select = function (fn) {
-        return new SelectEnumerable(this, fn);
+        return SelectEnumerable(this, fn);
     };
 
     var selectMany = function (fn) {
-        return new SelectManyEnumerable(this, fn);
+        return SelectManyEnumerable(this, fn);
     };
 
     var take = function (count) {
-        return new TakeEnumerable(this, count || 0);
+        return TakeEnumerable(this, count || 0);
     };
 
     var takeWhile = function (fn) {
-        return new TakeEnumerable(this, fn || 0);
+        return TakeEnumerable(this, fn || 0);
     };
 
     var skip = function (count) {
-        return new SkipEnumerable(this, count || 0);
+        return SkipEnumerable(this, count || 0);
     };
 
     var skipWhile = function (fn) {
-        return new SkipEnumerable(this, fn || 0);
-    };
-
-    var __iterator__ = function() {
-        for (var i = 0; i < this._array.length; i++) {
-            yield this._array[i]
-        };
+        return SkipEnumerable(this, fn || 0);
     };
 
     var toArray = function() {
         var arr = [];
-        for (var i in this) {
+        for (let i of this()) {
             arr.push(i);
         }
         return arr;
     };
 
-    Enumerable.prototype.where = where;
-    Enumerable.prototype.filter = where;
+    generator.where = where;
+    generator.filter = where;
 
-    Enumerable.prototype.select = select;
-    Enumerable.prototype.map = select;
-    Enumerable.prototype.selectMany = selectMany;
+    generator.select = select;
+    generator.map = select;
+    generator.selectMany = selectMany;
 
-    Enumerable.prototype.first = first(false, fnTrue);
-    Enumerable.prototype.firstOrDefault = first(true, fnTrue);
+    generator.first = first(false, fnTrue);
+    generator.firstOrDefault = first(true, fnTrue);
 
-    Enumerable.prototype.single = single(false, fnTrue);
-    Enumerable.prototype.singleOrDefault = single(true, fnTrue);
+    generator.single = single(false, fnTrue);
+    generator.singleOrDefault = single(true, fnTrue);
 
-    Enumerable.prototype.all = all;
-    Enumerable.prototype.any = any;
-    Enumerable.prototype.count = count;
+    generator.all = all;
+    generator.any = any;
+    generator.count = count;
 
-    Enumerable.prototype.take = take;
-    Enumerable.prototype.takeWhile = takeWhile;
+    generator.take = take;
+    generator.takeWhile = takeWhile;
 
-    Enumerable.prototype.skip = skip;
-    Enumerable.prototype.skipWhile = skipWhile;
+    generator.skip = skip;
+    generator.skipWhile = skipWhile;
 
-    Enumerable.prototype.__iterator__ = __iterator__;
-    Enumerable.prototype.toArray = toArray;
+    generator.toArray = toArray;
 
     var WhereEnumerable = (function (__super) {
-        __extends(WhereEnumerable, __super);
-
-        function WhereEnumerable(enumerable, fn) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._fn = fn;
-        };
-
-        WhereEnumerable.prototype.__iterator__ = function() {
-            var arr = [];
-
-             var index = 0;
-            for (var item in this._enumerable) {
-                if (this._fn(item, index)) {
-                    arr.push(item);
-                    yield item;
+        return function WhereEnumerable(parent, fn) {
+            function* where(fn) {
+                var index = 0;
+                for (let x of parent()) {
+                    if (fn(x, index)) {
+                        yield x;
+                    }
+                    index++;
                 }
-                index++;
             }
 
-            this._enumerable = new Enumerable(arr);
+            var x = where.bind(this, fn);
+            __extends(x, __super);
+            return x;
         };
-
-        return WhereEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var SelectEnumerable = (function (__super) {
-        __extends(SelectEnumerable, __super);
-    
-        function SelectEnumerable(enumerable, fn) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._fn = fn;
+        return function (parent, fn) {
+            var selector = function* (parent, fn) {
+                var index = 0;
+                for (let item of parent()) {
+                    yield fn(item, index++);
+                }
+            };
+
+            var instance = selector.bind(this, parent, fn);
+            __extends(instance, __super);
+            return instance;
         };
-
-        SelectEnumerable.prototype.__iterator__ = function () {
-            var arr = [];
-
-            var index = 0;
-            for (var item in this._enumerable) {
-                let x = this._fn(item, index++);
-                arr.push(x);
-                yield x;
-            }
-        };
-
-        return SelectEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var SelectManyEnumerable = (function (__super) {
-        __extends(SelectManyEnumerable, __super);
-    
-        function SelectManyEnumerable(enumerable, colSelector, resultSelector) {
-            __super.call(this, enumerable, colSelector);
-            this._resultSelector = resultSelector || ((col, x) => x);
-        };
+        return function (parent, colSelector, resultSelector) {
+            var selectMany = function* (parent, colSelector, resultSelector) {
+                resultSelector = resultSelector || function (col, x) { return x; };
+                var index = 0;
 
-        SelectManyEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-
-            for (let item in this._enumerable) {
-                let arr = this._fn(item, index++);
-                for (let i = 0; i < arr.length; i++) {
-                    let foo = this._resultSelector(arr, arr[i]);
-                    yield foo;
+                for (let item of parent()) {
+                    let arr = colSelector(item, index++);
+                    for (let i = 0; i < arr.length; i++) {
+                        let foo = resultSelector(arr, arr[i]);
+                        yield foo;
+                    }
                 }
-            }
-        };
+            };
 
-        return SelectManyEnumerable;
-    })(SelectEnumerable);
+            var instance = selectMany.bind(this, parent, colSelector, resultSelector);
+            __extends(instance, __super);
+            return instance;
+        };
+    })(generator);
 
     var RangeEnumerable = (function (__super) {
-        __extends(RangeEnumerable, __super);
+        return function (start, end) {
+            var ranger = function* (start, end) {
+                for (start; start <= end; start++) {
+                    yield start;
+                }
+            };
 
-        function RangeEnumerable(enumerable, start, end) {
-            __super.call(this, enumerable._array);
-            this._start = start;
-            this._end = end;
+            var instance = ranger.bind(this, start, end);
+            __extends(instance, __super);
+            return instance;
         };
-        RangeEnumerable.prototype.__iterator__ = function () {
-            for (var i = this._start; i <= this._end; i++) {
-                yield i;
-            }
-        };
-
-        return RangeEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var TakeEnumerable = (function (__super) {
-        __extends(TakeEnumerable, __super);
-
-        function TakeEnumerable(enumerable, selector) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._selector = selector;
-        }
-
-        TakeEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-            if (typeof this._selector === 'number') {
-                for (let item in this._enumerable) {
-                    if (index < this._selector) {
-                        yield item;
+        return function (parent, selector) {
+            var taker = function* (parent, selector) {
+                var index = 0;
+                if (typeof selector === 'number') {
+                    for (let item of parent()) {
+                        if (index < selector) {
+                            yield item;
+                            index++;
+                        } else {
+                            break;
+                        }
+                    }
+                } else if (typeof selector === 'function') {
+                    for (let item of parent()) {
+                        if (selector(item, index)) {
+                            yield item;
+                        } else {
+                            break;
+                        }
                         index++;
-                    } else {
-                        break;
                     }
                 }
-            } else if (typeof this._selector === 'function') {
-                for (let item in this._enumerable) {
-                    if (this._selector(item, index)) {
-                        yield item;
-                    } else {
-                        break;
-                    }
-                    index++;
-                }
-            }
-        };
+            };
 
-        return TakeEnumerable;
-    })(Enumerable);
+            var instance = taker.bind(this, parent, selector);
+            __extends(instance, __super);
+            return instance;
+        };
+    })(generator);
 
     var SkipEnumerable = (function (__super) {
-        __extends(SkipEnumerable, __super);
-
-        function SkipEnumerable(enumerable, selector) {
-            __super.call(this, enumerable._array);
-            this._enumerable = enumerable;
-            this._selector = selector;
-        }
-
-        SkipEnumerable.prototype.__iterator__ = function () {
-            var index = 0;
-            if (typeof this._selector === 'number') {
-                for (let item in this._enumerable) {
-                    if (index >= this._selector) {
-                        yield item;
+        return function (parent, selector) {
+            var skippy = function* (parent, selector) {
+                var index = 0;
+                if (typeof selector === 'number') {
+                    for (let item of parent()) {
+                        if (index >= selector) {
+                            yield item;
+                        }
+                        index++;
                     }
-                    index++;
-                }
-            } else if (typeof this._selector === 'function') {
-                let flag = false;
-                index = -1;
-                for (let item in this._enumerable) {
-                    index++;
-                    if (!flag && !this._selector(item, index)) {
-                        flag = true;
-                    }
+                } else if (typeof selector === 'function') {
+                    let flag = false;
+                    index = -1;
+                    for (let item of parent()) {
+                        index++;
+                        if (!flag && !selector(item, index)) {
+                            flag = true;
+                        }
 
-                    if (flag) {
-                        yield item;
+                        if (flag) {
+                            yield item;
+                        }
                     }
                 }
-            }
+            };
+
+            var instance = skippy.bind(this, parent, selector);
+            __extends(instance, __super);
+            return instance;
         };
-
-        return SkipEnumerable;
-    })(Enumerable);
+    })(generator);
 
     var RepeatEnumerable = (function (__super) {
-        __extends(RepeatEnumerable, __super);
+        return function (item, count) {
+            var repeater = function* (item, count) {
+                var stripped = JSON.stringify(item);
+                for (var i = 0; i < count; i++) {
+                    yield JSON.parse(stripped);
+                }
+            };
 
-        function RepeatEnumerable(item, count) {
-            __super.call(this);
-            this._item = item;
-            this._count = count;
-        }
-
-        RepeatEnumerable.prototype.__iterator__ = function () {
-             for (var i = 0; i < this._count; i++) {
-                yield this._item;
-             }
+            var instance = repeater.bind(this, item, count);
+            __extends(instance, __super);
+            return instance;
         };
-
-        return RepeatEnumerable;
-    })(Enumerable);
+    })(generator);
 
     Enumerable.range = function (start, end) {
         start = start || 0;
         end = end || 0;
 
-        return new RangeEnumerable([], start, end);
+        return RangeEnumerable(start, end);
     };
 
     Enumerable.repeat = function (item, count) {
-        return new RepeatEnumerable(item, count || 0);
+        return RepeatEnumerable(item, count || 0);
     };
 
     // extension methods
     Array.prototype.asEnumerable = function() {
-        return new Enumerable(this);
+        return Enumerable(this);
     };
 
     if (typeof module === 'object' && typeof module.exports === 'object') {
