@@ -26,7 +26,7 @@
     var first = function (nullable, selector) {
         return function (fn) {
             fn = fn || selector;
-            for (let item in this()) {
+            for (let item of this()) {
                 if (fn(item)) {
                     return item;
                 }
@@ -43,7 +43,7 @@
         return function (fn) {
             fn = fn || selector;
             var matched;
-            for (let item in this()) {
+            for (let item of this()) {
                 if (fn(item)) {
                     if (matched) {
                         throw 'Sequence contains more than one matching element';
@@ -67,7 +67,7 @@
     };
 
     var all = function (fn) {
-        for (let x in this()) {
+        for (let x of this()) {
             if (!fn(x)) {
                 return false;
             }
@@ -79,7 +79,7 @@
     var any = function (fn) {
         fn = fn || fnTrue;
 
-        for (let x in this()) {
+        for (let x of this()) {
             if (fn(x)) {
                 return true;
             }
@@ -91,7 +91,7 @@
         fn = fn || fnTrue;
 
         var count = 0;
-        for (var i in this()) {
+        for (var i of this()) {
             if (fn(i)) {
                 count++;
             }
