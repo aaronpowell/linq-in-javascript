@@ -1,7 +1,7 @@
 {
-  "name": "linq-in-javascript",
+  "name": "linq-es6",
   "version": "0.1.0",
-  "description": "",
+  "description": "An implementation of .NET's LINQ API in JavaScrpit using ES6 generators for lazy evaluation",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -23,5 +23,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/aaronpowell/linq-in-javascript/issues"
-  }
+  },
+  "engines": [{
+    "node" : ">=0.11.4"
+  }]
 }
