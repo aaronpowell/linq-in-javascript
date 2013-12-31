@@ -1,7 +1,8 @@
 {
   "name": "linq-es6",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An implementation of .NET's LINQ API in JavaScrpit using ES6 generators for lazy evaluation",
+  "keywords": ["linq"],
   "main": "index.js",
   "directories": {
     "test": "tests"
