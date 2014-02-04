@@ -99,21 +99,12 @@
         return count;
     };
 
-    var aggregate = function (seed, fn, selector) {
-        if (!fn) {
-            fn = seed;
-            seed = undefined;
+    var aggregate = function (fn) {
+        var seed = this.next();
+        for (let item of this) {
+            seed = fn(seed, item);
         }
-
-        selector = selector || x => x;
-
-        if (seed == undefined) {
-
-        }
-
-        for (let item in this) {
-
-        }
+        return seed;
     };
 
     var where = function (fn) {
@@ -168,6 +159,7 @@
     generator.all = all;
     generator.any = any;
     generator.count = count;
+	generator.aggregate = aggregate;
 
     generator.take = take;
     generator.takeWhile = takeWhile;
