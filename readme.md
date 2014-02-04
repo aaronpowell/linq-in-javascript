@@ -25,10 +25,24 @@ To do this it leverages the [ES6 Iterators](http://wiki.ecmascript.org/doku.php?
 
 The following LINQ methods are implemented:
 
-* `where`, aliased to `filter`
-* `select`, aliased to `map`
+* `aggregate`
+* `all`
+* `any`
+* `asEnumerable`
+* `average`
+* `concat`
+* `contains`
+* `count`
 * `first`, `firstOrDefault`
+* `range`
+* `repeat`
+* `select`, aliased to `map`
+* `selectMany`
 * `single`, `singleOrDefault`
+* `toArray`
+* `where`, aliased to `filter`
+
+_The full list of what LINQ in .NET does can be found [here](http://msdn.microsoft.com/en-us/library/system.linq.enumerable_methods(v=vs.110).aspx)._
 
 # License
 
