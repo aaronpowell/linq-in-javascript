@@ -144,6 +144,10 @@
         throw Error('No items in the collection');
     };
 
+    var concat = function (col) {
+        return ConcatEnumerable(this, col);;
+    }
+
     var where = function (fn) {
         return WhereEnumerable(this, fn);
     };
@@ -198,6 +202,7 @@
     generator.count = count;
     generator.aggregate = aggregate;
     generator.average = average;
+    generator.concat = concat;
 
     generator.take = take;
     generator.takeWhile = takeWhile;
@@ -206,6 +211,28 @@
     generator.skipWhile = skipWhile;
 
     generator.toArray = toArray;
+
+    var ConcatEnumerable = (function (__super) {
+        return function (parent, col) {
+            if (col.constructor === Array) {
+                col = col.asEnumerable();
+            }
+
+            function* concat(col) {
+                for (let item of parent()) {
+                    yield item;
+                }
+
+                for (let item of col()) {
+                    yield item;
+                }
+            }
+
+            var x = concat.bind(this, col);
+            __extends(x, __super);
+            return x;
+        };
+    })(generator);
 
     var WhereEnumerable = (function (__super) {
         return function WhereEnumerable(parent, fn) {
