@@ -148,6 +148,25 @@
         return ConcatEnumerable(this, col);;
     };
 
+    var contains = function (value, tester) {
+        var it = this();
+
+        if (!tester) {
+            for (let item of it) {
+                if (item === value) {
+                    return true;
+                }
+            }
+        } else {
+            for (let item of it) {
+                if (tester(item, value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
     var where = function (fn) {
         return WhereEnumerable(this, fn);
     };
@@ -203,6 +222,7 @@
     generator.aggregate = aggregate;
     generator.average = average;
     generator.concat = concat;
+    generator.contains = contains;
 
     generator.take = take;
     generator.takeWhile = takeWhile;
