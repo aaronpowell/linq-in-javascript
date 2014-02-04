@@ -43,7 +43,7 @@ describe('Enumerable', function () {
 
             var selected = range.select(x => x + 1);
 
-            expect(selected.toArray()).to.deep.equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+            expect(selected.toArray()).to.deep.equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         });
 
         it('should allow a take from a range', function () {

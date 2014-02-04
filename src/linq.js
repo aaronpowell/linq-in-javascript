@@ -226,7 +226,7 @@
     var RangeEnumerable = (function (__super) {
         return function (start, end) {
             var ranger = function* (start, end) {
-                for (start; start <= end; start++) {
+                for (let i = 0; i < end; start++, i++) {
                     yield start;
                 }
             };
