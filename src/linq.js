@@ -146,7 +146,7 @@
 
     var concat = function (col) {
         return ConcatEnumerable(this, col);;
-    }
+    };
 
     var where = function (fn) {
         return WhereEnumerable(this, fn);
