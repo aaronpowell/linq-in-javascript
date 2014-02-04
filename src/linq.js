@@ -100,8 +100,9 @@
     };
 
     var aggregate = function (fn) {
-        var seed = this.next();
-        for (let item of this) {
+        var it = this();
+        var seed = it.next().value;
+        for (let item of it) {
             seed = fn(seed, item);
         }
         return seed;

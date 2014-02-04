@@ -5,7 +5,7 @@ describe('Enumerable', function () {
 
             var result = arr.aggregate((curr, next) => curr + next);
 
-            expect(result).toEqual(50);
+            expect(result).to.equal(45);
         });
     });
 });
