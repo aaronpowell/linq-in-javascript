@@ -6,6 +6,7 @@
     };
 
     var fnTrue = function () { return true; };
+    var fnSelf = function (x) { return x; };
 
     var generator = function* (array) {
         for (let i = 0; i < array.length; i++) {
@@ -126,6 +127,23 @@
         return seed;
     };
 
+    var average = function (fn) {
+        var total = 0;
+        var count = 0;
+
+        fn = fn || fnSelf;
+
+        for (let item of this()) {
+            total += fn(item);
+            count++;
+        }
+
+        if (count) {
+            return total / count;
+        }
+        throw Error('No items in the collection');
+    };
+
     var where = function (fn) {
         return WhereEnumerable(this, fn);
     };
@@ -178,7 +196,8 @@
     generator.all = all;
     generator.any = any;
     generator.count = count;
-	generator.aggregate = aggregate;
+    generator.aggregate = aggregate;
+    generator.average = average;
 
     generator.take = take;
     generator.takeWhile = takeWhile;
