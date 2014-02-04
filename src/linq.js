@@ -99,11 +99,29 @@
         return count;
     };
 
-    var aggregate = function (fn) {
+    var aggregate = function (seed, fn, selector) {
         var it = this();
-        var seed = it.next().value;
+
+        switch (arguments.length) {
+            case 1:
+                fn = seed;
+                seed = it.next().value;
+                break;
+
+            case 2:
+                if (typeof seed === 'function') {
+                    selector = fn;
+                    fn = seed;
+                    seed = it.next().value;
+                }
+                break;
+        }
         for (let item of it) {
             seed = fn(seed, item);
+        }
+
+        if (selector) {
+            return selector(seed);
         }
         return seed;
     };
