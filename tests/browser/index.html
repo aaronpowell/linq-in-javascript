@@ -3,11 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>Mocha Tests</title>
-  <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.css" />
 </head>
 <body>
   <div id="mocha"></div>
   <script src="../../node_modules/mocha/mocha.js"></script>
+  <script>
+    if (!window.mocha) {
+      var s = document.createElement('script');
+      s.src = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.js';
+      document.getElementsByTagName('head').appendChild(s);
+    }
+  </script>
   <script src="chai.js"></script>
   <script>
     mocha.setup('bdd');
