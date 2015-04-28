@@ -5,8 +5,8 @@
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     };
 
-    var fnTrue = function () { return true; };
-    var fnSelf = function (x) { return x; };
+    var fnTrue = () => true;
+    var fnSelf = x => x;
 
     var generator = function* (array) {
         for (let i = 0; i < array.length; i++) {
@@ -401,16 +401,9 @@
         };
     })(generator);
 
-    Enumerable.range = function (start, end) {
-        start = start || 0;
-        end = end || 0;
+    Enumerable.range = (start = 0, end = 0) => RangeEnumerable(start, end);
 
-        return RangeEnumerable(start, end);
-    };
-
-    Enumerable.repeat = function (item, count) {
-        return RepeatEnumerable(item, count || 0);
-    };
+    Enumerable.repeat = (item, count = 0) => RepeatEnumerable(item, count || 0);
 
     // extension methods
     Array.prototype.asEnumerable = function() {
