@@ -9,42 +9,81 @@
   <div id="mocha"></div>
   <script src="../../node_modules/mocha/mocha.js"></script>
   <script>
-    if (!window.mocha.setup) {
-      var s = document.createElement('script');
-      s.src = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.js';
-      document.getElementsByTagName('head')[0].appendChild(s);
-    }
+    (function () {
+        'use strict';
+        if (!window.mocha.setup) {
+          var s = document.createElement('script');
+          s.src = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.js';
+          document.getElementsByTagName('head')[0].appendChild(s);
+        }
+    })();
   </script>
   <script src="chai.js"></script>
   <script>
     mocha.setup('bdd');
     var expect = chai.expect;
   </script>
-  <script type="application/javascript;version=1.7" src="../../src/linq.js"></script>
-
-  <script type="application/javascript;version=1.7" src="../enumerable.js"></script>
-  <script type="application/javascript;version=1.7" src="../aggregate.js"></script>
-  <script type="application/javascript;version=1.7" src="../average.js"></script>
-  <script type="application/javascript;version=1.7" src="../all.js"></script>
-  <script type="application/javascript;version=1.7" src="../any.js"></script>
-  <script type="application/javascript;version=1.7" src="../concat.js"></script>
-  <script type="application/javascript;version=1.7" src="../contains.js"></script>
-  <script type="application/javascript;version=1.7" src="../count.js"></script>
-  <script type="application/javascript;version=1.7" src="../first.js"></script>
-  <script type="application/javascript;version=1.7" src="../firstOrDefault.js"></script>
-  <script type="application/javascript;version=1.7" src="../select.js"></script>
-  <script type="application/javascript;version=1.7" src="../single.js"></script>
-  <script type="application/javascript;version=1.7" src="../singleOrDefault.js"></script>
-  <script type="application/javascript;version=1.7" src="../skip.js"></script>
-  <script type="application/javascript;version=1.7" src="../take.js"></script>
-  <script type="application/javascript;version=1.7" src="../where.js"></script>
-  
-  <script type="application/javascript;version=1.7" src="../api-usages.js"></script>
 
   <script>
-    mocha.checkLeaks();
-    mocha.globals([]);
-    mocha.run();
+    (function () {
+        'use strict';
+
+        var scriptPaths = [
+            '../../src/linq.js',
+            '../enumerable.js',
+            '../aggregate.js',
+            '../average.js',
+            '../all.js',
+            '../any.js',
+            '../concat.js',
+            '../contains.js',
+            '../count.js',
+            '../first.js',
+            '../firstOrDefault.js',
+            '../select.js',
+            '../single.js',
+            '../singleOrDefault.js',
+            '../skip.js',
+            '../take.js',
+            '../where.js',
+            '../api-usages.js'
+        ];
+
+        var type;
+
+        var loadCount = 0;
+
+        try {
+          eval('let a = 1;');
+          return;
+        } catch (e) {
+            type = 'application/javascript;version=1.7';
+        }
+
+        scriptPaths.map(function (s) {
+            var el = document.createElement('script');
+            el.src = s;
+            if (type) {
+                el.setAttribute('type', type);
+            }
+
+            document.getElementsByTagName('head')[0].appendChild(el);
+
+            el.addEventListener('load', function () {
+                loadCount++;
+            });
+        });
+
+        setTimeout(function waiter() {
+            if (loadCount === scriptPaths.length) {
+                mocha.checkLeaks();
+                mocha.globals([]);
+                mocha.run();
+            } else {
+                setTimeout(waiter, 100);
+            }
+        }, 100);
+    })();
   </script>
 </body>
 </html>
