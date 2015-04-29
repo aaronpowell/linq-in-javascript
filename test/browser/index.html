@@ -8,7 +8,6 @@
 <body>
   <div id="mocha"></div>
   <script src="../../node_modules/mocha/mocha.js"></script>
-  <script src="../../node_modules/chai/chai.js"></script>
   <script>
     (function () {
         'use strict';
@@ -28,9 +27,15 @@
         }
     })();
   </script>
+  <script src="../../node_modules/chai/chai.js"></script>
   <script>
     mocha.setup('bdd');
     var expect = chai.expect;
+
+    window.exports = {};
+    window.module = {
+        exports: window.exports
+    };
   </script>
 
   <script>
@@ -38,7 +43,7 @@
         'use strict';
 
         var scriptPaths = [
-            '../../dist/linq-es5.js',
+            '../../dist/linq.js',
             '../enumerable.js',
             '../aggregate.js',
             '../average.js',
