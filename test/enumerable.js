@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('Enumerable', function () {
     describe('creation', function () {
         it('should allow creation from an existing array', function () {

@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.where', function () {
     it('should handle simple lambda filters', function () {
         var arr = [1, 2, 3];

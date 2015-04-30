@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.select', function () {
     it('should have a .select method', function () {
         var enumerable = [].asEnumerable();

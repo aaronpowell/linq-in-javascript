@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('Interesting API usages', function () {
    it('should calc prime numbers', function () {
         var range = Enumerable.range(3, 10);

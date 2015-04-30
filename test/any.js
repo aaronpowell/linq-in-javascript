@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.any', function () {
     describe('return true', function () {
         it('should return true when no callback and the collection has items', function () {

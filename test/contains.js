@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.contains', function () {
     it('should return true if it finds a matching value', function () {
         var arr = Enumerable.range(0, 10);

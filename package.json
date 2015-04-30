@@ -20,7 +20,7 @@
     "mocha": "^2.2.4"
   },
   "scripts": {
-    "test": "mocha --require ./test/_helper.js --require ./test/_es6.js --harmony_arrow_functions"
+    "test": "mocha --require ./test-helpers/_helper.js --require ./test-helpers/_es6.js --harmony_arrow_functions"
   },
   "repository": {
     "type": "git",
