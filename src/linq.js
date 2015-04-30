@@ -148,7 +148,7 @@ class Enumerable {
         return new ConcatEnumerable(this, col);
     }
 
-    contains(value, tester = fnTrue) {
+    contains(value, tester = x => x === value) {
         var it = this;
 
         for (let item of it) {
