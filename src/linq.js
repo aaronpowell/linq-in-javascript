@@ -24,8 +24,7 @@ var Enumerable = function (array) {
 };
 
 var first = function (nullable, selector) {
-    return function (fn) {
-        fn = fn || selector;
+    return function (fn = selector) {
         for (let item of this()) {
             if (fn(item)) {
                 return item;
@@ -40,7 +39,7 @@ var first = function (nullable, selector) {
 };
 
 var single = function (nullable, selector) {
-    return function (fn) {
+    return function (fn = selector) {
         fn = fn || selector;
         var matched;
         for (let item of this()) {
@@ -76,9 +75,7 @@ var all = function (fn) {
     return true;
 };
 
-var any = function (fn) {
-    fn = fn || fnTrue;
-
+var any = function (fn = fnTrue) {
     for (let x of this()) {
         if (fn(x)) {
             return true;
@@ -87,9 +84,7 @@ var any = function (fn) {
     return false;
 }
 
-var count = function (fn) {
-    fn = fn || fnTrue;
-
+var count = function (fn = fnTrue) {
     var count = 0;
     for (var i of this()) {
         if (fn(i)) {
@@ -126,11 +121,9 @@ var aggregate = function (seed, fn, selector) {
     return seed;
 };
 
-var average = function (fn) {
+var average = function (fn = fnSelf) {
     var total = 0;
     var count = 0;
-
-    fn = fn || fnSelf;
 
     for (let item of this()) {
         total += fn(item);
