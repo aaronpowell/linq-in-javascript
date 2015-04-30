@@ -129,7 +129,7 @@ class Enumerable {
     }
 
     average(fn = fnSelf) {
-        var totl = 0;
+        var total = 0;
         var count = 0;
 
         for (let item of this) {
