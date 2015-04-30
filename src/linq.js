@@ -3,10 +3,15 @@
 var fnTrue = () => true;
 var fnSelf = x => x;
 
+let enumerableSymbols = {
+    arr: Symbol(),
+    index: Symbol()
+};
+
 class Enumerable {
     constructor(arr = []) {
-        this.arr = arr;
-        this.index = 0;
+        this[enumerableSymbols.arr] = arr;
+        this[enumerableSymbols.index] = 0;
     }
 
     [Symbol.iterator]() {
@@ -14,9 +19,9 @@ class Enumerable {
     }
 
     next() {
-        if (this.index < this.arr.length) {
+        if (this[enumerableSymbols.index] < this[enumerableSymbols.arr].length) {
             return {
-                value: this.arr[this.index++],
+                value: this[enumerableSymbols.arr][this[enumerableSymbols.index]++],
                 done: false
             };
         }
