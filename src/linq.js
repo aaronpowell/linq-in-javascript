@@ -263,7 +263,7 @@ class SelectEnumerable extends Enumerable {
             return value;
         }
         return {
-            value: this.fn(value, this._index++),
+            value: this.fn(value.value, this._index++),
             done: false
         };
     }
@@ -292,20 +292,25 @@ class SelectManyEnumerable extends Enumerable {
 }
 
 class RangeEnumerable extends Enumerable {
-    constructor(start, end) {
+    constructor(start, count) {
         super();
-        this.end = end;
-        this.index = start;
+        this.count = count;
+        this.index = 0;
+        this.start = start;
     }
 
     next() {
-        if (this.index === this.end) {
+        if (this.index === this.count) {
             return {
                 done: true
             };
         }
+
+        var value = this.start;
+        this.start++;
+        this.index++;
         return {
-            value: this.index++,
+            value: value,
             done: false
         };
     }
@@ -394,7 +399,7 @@ class RepeatEnumerable extends Enumerable {
         }
 
         var stripped = JSON.stringify(this.item);
-        this.indx++;
+        this.index++;
         return {
             value: JSON.parse(stripped),
             done: false
@@ -404,7 +409,7 @@ class RepeatEnumerable extends Enumerable {
 
 // extension methods
 Array.prototype.asEnumerable = function() {
-    return Enumerable(this);
+    return new Enumerable(this);
 };
 
 export default Enumerable;
