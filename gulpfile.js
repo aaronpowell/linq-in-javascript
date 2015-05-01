@@ -10,11 +10,6 @@ gulp.task('watch', function () {
 
 gulp.task('build', function () {
     return gulp.src('./src/linq.js')
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            modules: 'common',
-            blacklist: ['regenerator']
-        }))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./dist'));
 });
@@ -58,4 +53,4 @@ gulp.task('build-es5', function () {
         .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('default', ['build', 'build-es5']);
+gulp.task('default', ['build', 'build-es5', 'tests', 'tests-es5']);
