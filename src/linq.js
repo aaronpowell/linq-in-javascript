@@ -376,8 +376,9 @@ class SkipEnumerable extends Enumerable {
         }
 
         if (typeof this.selector === 'number') {
-            if (this.index >= this.selector) {
-                this.index++;
+            var i = this.index;
+            this.index++;
+            if (i >= this.selector) {
                 return item;
             } else {
                 return this.next();
