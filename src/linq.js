@@ -246,6 +246,7 @@ class WhereEnumerable extends Enumerable {
         super();
         this.arr = arr;
         this.selector = selector;
+        this.index = 0;
     }
 
     next() {
@@ -254,7 +255,7 @@ class WhereEnumerable extends Enumerable {
             return val;
         }
 
-        if (this.selector(val.value)) {
+        if (this.selector(val.value, this.index++)) {
             return val;
         }
 
