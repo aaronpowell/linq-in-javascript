@@ -33,81 +33,6 @@ class Enumerable {
         };
     }
 
-    first(selector = fnTrue) {
-        for (let item of this) {
-            if (selector(item)) {
-                return item;
-            }
-        }
-
-        throw new Error('Sequence contains no matching elements');
-    }
-
-    firstOrDefault(selector = fnTrue) {
-        try {
-            return this.first(selector);
-        } catch (e) {
-            return undefined;
-        }
-    }
-
-    single(selector = fnTrue) {
-        var matched;
-        for (let item of this) {
-            if (selector(item)) {
-                if (matched) {
-                    throw Error('Sequence contains more than one matching element');
-                } else {
-                    matched = item;
-                }
-            }
-        }
-        if (matched) {
-            return matched;
-        }
-
-        throw Error('Sequence contains no matching element');
-    }
-
-    singleOrDefault(selector = fnTrue) {
-        try {
-            return this.single(selector);
-        } catch (e) {
-            if (e.message === 'Sequence contains no matching element') {
-                return undefined;
-            }
-            throw e;
-        }
-    }
-
-    all(fn = fnTrue) {
-        for (let x of this) {
-            if (!fn(x)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    any(fn = fnTrue) {
-        for (let x of this) {
-            if (fn(x)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    count(fn = fnTrue) {
-        var count = 0;
-        for (let i of this) {
-            if (fn(i)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     aggregate(seed, fn, selector) {
         var it = this;
 
@@ -133,6 +58,24 @@ class Enumerable {
             return selector(seed);
         }
         return seed;
+    }
+
+    all(fn = fnTrue) {
+        for (let x of this) {
+            if (!fn(x)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    any(fn = fnTrue) {
+        for (let x of this) {
+            if (fn(x)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     average(fn = fnSelf) {
@@ -166,35 +109,77 @@ class Enumerable {
         return false;
     }
 
-    where(selector) {
-        return new WhereEnumerable(this, selector);
+    count(fn = fnTrue) {
+        var count = 0;
+        for (let i of this) {
+            if (fn(i)) {
+                count++;
+            }
+        }
+        return count;
     }
-    
+
     filter(selector) {
         return this.where(selector);
     }
 
-    select(fn = fnSelf) {
-        return new SelectEnumerable(this, fn);
+    first(selector = fnTrue) {
+        for (let item of this) {
+            if (selector(item)) {
+                return item;
+            }
+        }
+
+        throw new Error('Sequence contains no matching elements');
+    }
+
+    firstOrDefault(selector = fnTrue) {
+        try {
+            return this.first(selector);
+        } catch (e) {
+            return undefined;
+        }
     }
 
     map(fn) {
         return this.select(fn);
     }
 
+    select(fn = fnSelf) {
+        return new SelectEnumerable(this, fn);
+    }
+
     selectMany(fn = fnSelf) {
         return new SelectManyEnumerable(this, fn);
     }
 
-    take(count = 0) {
-        return new TakeEnumerable(this, count);
+    single(selector = fnTrue) {
+        var matched;
+        for (let item of this) {
+            if (selector(item)) {
+                if (matched) {
+                    throw Error('Sequence contains more than one matching element');
+                } else {
+                    matched = item;
+                }
+            }
+        }
+        if (matched) {
+            return matched;
+        }
+
+        throw Error('Sequence contains no matching element');
     }
 
-    takeWhile(fn = 0) {
-        if (fn === 0) {
-            return this.take();
+    singleOrDefault(selector = fnTrue) {
+        try {
+            return this.single(selector);
+        } catch (e) {
+            if (e.message === 'Sequence contains no matching element') {
+                return undefined;
+            }
+            throw e;
         }
-        return new TakeEnumerable(this, fn);
     }
 
     skip(count = 0) {
@@ -208,12 +193,27 @@ class Enumerable {
         return new SkipEnumerable(this, fn);
     }
 
+    take(count = 0) {
+        return new TakeEnumerable(this, count);
+    }
+
+    takeWhile(fn = 0) {
+        if (fn === 0) {
+            return this.take();
+        }
+        return new TakeEnumerable(this, fn);
+    }
+
     toArray() {
         var arr = [];
         for (let i of this) {
             arr.push(i);
         }
         return arr;
+    }
+
+    where(selector) {
+        return new WhereEnumerable(this, selector);
     }
 
     static range(start = 0, end = 0) {
