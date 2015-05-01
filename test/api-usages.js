@@ -10,7 +10,7 @@ describe('Interesting API usages', function () {
 
         var expectedPrimes = [3, 5, 7, 11];
         var index = 0;
-        for (let prime of primes()) {
+        for (let prime of primes) {
             expect(prime).to.equal(expectedPrimes[index]);
             index++;
         }
