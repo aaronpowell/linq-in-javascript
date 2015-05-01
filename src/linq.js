@@ -71,7 +71,7 @@ class Enumerable {
         try {
             return this.single(selector);
         } catch (e) {
-            if (e.message === 'Sequence contains no matching elements') {
+            if (e.message === 'Sequence contains no matching element') {
                 return undefined;
             }
             throw e;
