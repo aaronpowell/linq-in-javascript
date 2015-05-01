@@ -167,6 +167,10 @@ class Enumerable {
     where(selector) {
         return new WhereEnumerable(this, selector);
     }
+    
+    filter(selector) {
+        return this.where(selector);
+    }
 
     select(fn = fnSelf) {
         return new SelectEnumerable(this, fn);

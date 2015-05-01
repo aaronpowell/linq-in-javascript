@@ -10,7 +10,7 @@ describe('.where', function () {
         var filtered = items.where(x => true);
 
         var pos = 0;
-        for (var item of filtered()) {
+        for (var item of filtered) {
             expect(item).to.equal(arr[pos]);
             pos++;
         }
@@ -23,7 +23,7 @@ describe('.where', function () {
         var filtered = items.where(x => x == 2);
 
         var pos = 0;
-        for (var item of filtered()) {
+        for (var item of filtered) {
             expect(item).to.equal(2);
             pos++;
         }
@@ -37,7 +37,7 @@ describe('.where', function () {
         var filtered = items.where(x => x >= 2).where(x => x == 2);
 
         var pos = 0;
-        for (var item of filtered()) {
+        for (var item of filtered) {
             expect(item).to.equal(2);
             pos++;
         }
@@ -54,7 +54,7 @@ describe('.where', function () {
         var filtered = items.where(x => x());
 
         var pos = 0;
-        for (var item of filtered()) {
+        for (var item of filtered) {
             expect(item).to.equal(arr[pos]);
             pos++;
             break;
@@ -72,7 +72,7 @@ describe('.where', function () {
             return true;
         });
 
-        for (var item of filtered()) {
+        for (var item of filtered) {
             //noop
         }
         expect(pos).to.equal(3);
@@ -80,8 +80,16 @@ describe('.where', function () {
 });
 
 describe('.filter', function () {
-    it('should have a filter method that is an alias for where', function () {
-        var items = Enumerable();
-        expect(items.filter).to.equal(items.where);
+    it('should be able to use filter like where', function () {
+        var arr = [1, 2, 3];
+        var items = arr.asEnumerable();
+
+        var filtered = items.filter(x => true);
+
+        var pos = 0;
+        for (var item of filtered) {
+            expect(item).to.equal(arr[pos]);
+            pos++;
+        }
     });
 });
