@@ -3,6 +3,7 @@ var sourcemaps = require("gulp-sourcemaps");
 var babel = require("gulp-babel");
 var rename = require('gulp-rename');
 var mocha = require('gulp-mocha');
+var eslint = require('gulp-eslint');
 
 gulp.task('watch', function () {
     gulp.watch('./src/linq.js', ['default']);
@@ -10,6 +11,9 @@ gulp.task('watch', function () {
 
 gulp.task('build', function () {
     return gulp.src('./src/linq.js')
+        .pipe(eslint())
+        .pipe(eslint.formatEach())
+        .pipe(eslint.failOnError())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./dist'));
 });
@@ -44,6 +48,9 @@ gulp.task('tests-es5', function () {
 
 gulp.task('build-es5', function () {
     return gulp.src('./src/linq.js')
+        .pipe(eslint())
+        .pipe(eslint.formatEach())
+        .pipe(eslint.failOnError())
         .pipe(sourcemaps.init())
         .pipe(babel({
             modules: 'common'
