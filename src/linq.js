@@ -3,15 +3,17 @@
 var fnTrue = () => true;
 var fnSelf = x => x;
 
-let enumerableSymbols = {
-    arr: Symbol(),
-    index: Symbol()
-};
+let parentSymbol = Symbol();
+let indexSymbol = Symbol();
+let colSymbol = Symbol();
+let selectorSymbol = Symbol();
+let countSymbol = Symbol();
+let startSymbol = Symbol();
 
 class Enumerable {
     constructor(arr = []) {
-        this[enumerableSymbols.arr] = arr;
-        this[enumerableSymbols.index] = 0;
+        this[parentSymbol] = arr;
+        this[indexSymbol] = 0;
     }
 
     [Symbol.iterator]() {
@@ -19,9 +21,9 @@ class Enumerable {
     }
 
     next() {
-        if (this[enumerableSymbols.index] < this[enumerableSymbols.arr].length) {
+        if (this[indexSymbol] < this[parentSymbol].length) {
             return {
-                value: this[enumerableSymbols.arr][this[enumerableSymbols.index]++],
+                value: this[parentSymbol][this[indexSymbol]++],
                 done: false
             };
         }
@@ -226,17 +228,17 @@ class Enumerable {
 class ConcatEnumerable extends Enumerable {
     constructor(arr, col) {
         super();
-        this.arr = arr;
-        this.col = Array.isArray(col) ? col.asEnumerable() : col;
+        this[parentSymbol] = arr;
+        this[colSymbol] = Array.isArray(col) ? col.asEnumerable() : col;
     }
 
     next() {
-        var value = this.arr.next();
+        var value = this[parentSymbol].next();
         if (!value.done) {
             return value;
         }
 
-        value = this.col.next();
+        value = this[colSymbol].next();
         return value;
     }
 }
@@ -244,18 +246,18 @@ class ConcatEnumerable extends Enumerable {
 class WhereEnumerable extends Enumerable {
     constructor(arr, selector) {
         super();
-        this.arr = arr;
-        this.selector = selector;
-        this.index = 0;
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
     }
 
     next() {
-        var val = this.arr.next();
+        var val = this[parentSymbol].next();
         if (val.done) {
             return val;
         }
 
-        if (this.selector(val.value, this.index++)) {
+        if (this[selectorSymbol](val.value, this[indexSymbol]++)) {
             return val;
         }
 
@@ -266,18 +268,18 @@ class WhereEnumerable extends Enumerable {
 class SelectEnumerable extends Enumerable {
     constructor(arr, fn) {
         super();
-        this.arr = arr;
-        this.fn = fn;
-        this._index = 0;
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = fn;
+        this[indexSymbol] = 0;
     }
 
     next() {
-        var value = this.arr.next();
+        var value = this[parentSymbol].next();
         if (value.done) {
             return value;
         }
         return {
-            value: this.fn(value.value, this._index++),
+            value: this[selectorSymbol](value.value, this[indexSymbol]++),
             done: false
         };
     }
@@ -286,20 +288,20 @@ class SelectEnumerable extends Enumerable {
 class SelectManyEnumerable extends Enumerable {
     constructor(arr, colSelector, resultSelector) {
         super();
-        this.arr = arr;
-        this.colSelector = colSelector;
-        this.resultSelector = resultSelector || ((_, x) => x);
-        this._index = 0;
+        this[parentSymbol] = arr;
+        this[colSymbol] = colSelector;
+        this[selectorSymbol] = resultSelector || ((_, x) => x);
+        this[indexSymbol] = 0;
     }
 
     next() {
-        var value = this.arr.next();
+        var value = this[parentSymbol].next();
         if (value.done) {
             return value;
         }
-        let arr = this.colSelector(value.value, this._index++);
+        let arr = this[colSymbol](value.value, this[indexSymbol]++);
         return {
-            value: this.resultSelector(arr, arr[0]),
+            value: this[selectorSymbol](arr, arr[0]),
             done: false
         };
     }
@@ -308,21 +310,21 @@ class SelectManyEnumerable extends Enumerable {
 class RangeEnumerable extends Enumerable {
     constructor(start, count) {
         super();
-        this.count = count;
-        this.index = 0;
-        this.start = start;
+        this[countSymbol] = count;
+        this[indexSymbol] = 0;
+        this[startSymbol] = start;
     }
 
     next() {
-        if (this.index === this.count) {
+        if (this[indexSymbol] === this[countSymbol]) {
             return {
                 done: true
             };
         }
 
-        var value = this.start;
-        this.start++;
-        this.index++;
+        var value = this[startSymbol];
+        this[startSymbol]++;
+        this[indexSymbol]++;
         return {
             value: value,
             done: false
@@ -333,20 +335,20 @@ class RangeEnumerable extends Enumerable {
 class TakeEnumerable extends Enumerable {
     constructor(arr, selector) {
         super();
-        this.arr = arr;
-        this.selector = selector;
-        this.index = 0;
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
     }
 
     next() {
-        var item = this.arr.next();
+        var item = this[parentSymbol].next();
         if (item.done) {
             return item;
         }
 
-        if (typeof this.selector === 'number') {
-            if (this.index < this.selector) {
-                this.index++;
+        if (typeof this[selectorSymbol] === 'number') {
+            if (this[indexSymbol] < this[selectorSymbol]) {
+                this[indexSymbol]++;
                 return item;
             } else {
                 return {
@@ -354,8 +356,8 @@ class TakeEnumerable extends Enumerable {
                 };
             }
         } else {
-            if (this.selector(item.value, this.index)) {
-                this.index++;
+            if (this[selectorSymbol](item.value, this[indexSymbol])) {
+                this[indexSymbol]++;
                 return item;
             } else {
                 return {
@@ -369,31 +371,31 @@ class TakeEnumerable extends Enumerable {
 class SkipEnumerable extends Enumerable {
     constructor(arr, selector) {
         super();
-        this.arr = arr;
-        this.selector = selector;
-        this.index = 0;
-        this.flag = false;
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
+        this[startSymbol] = false;
     }
 
     next() {
-        var item = this.arr.next();
+        var item = this[parentSymbol].next();
         if (item.done) {
             return item;
         }
 
-        var i = this.index;
-        this.index++;
-        if (typeof this.selector === 'number') {
-            if (i >= this.selector) {
+        var i = this[indexSymbol];
+        this[indexSymbol]++;
+        if (typeof this[selectorSymbol] === 'number') {
+            if (i >= this[selectorSymbol]) {
                 return item;
             } else {
                 return this.next();
             }
         } else {
-            if (!this.flag && !this.selector(item.value, i)) {
-                this.flag = true;
+            if (!this[startSymbol] && !this[selectorSymbol](item.value, i)) {
+                this[startSymbol] = true;
             }
-            if (this.flag) {
+            if (this[startSymbol]) {
                 return item;
             }
             return this.next();
@@ -404,20 +406,20 @@ class SkipEnumerable extends Enumerable {
 class RepeatEnumerable extends Enumerable {
     constructor(item, count) {
         super();
-        this.item = item;
-        this.count = count;
-        this.index = 0;
+        this[selectorSymbol] = item;
+        this[countSymbol] = count;
+        this[indexSymbol] = 0;
     }
 
     next() {
-        if (this.index === this.count) {
+        if (this[indexSymbol] === this[countSymbol]) {
             return {
                 done: true
             };
         }
 
-        var stripped = JSON.stringify(this.item);
-        this.index++;
+        var stripped = JSON.stringify(this[selectorSymbol]);
+        this[indexSymbol]++;
         return {
             value: JSON.parse(stripped),
             done: false
