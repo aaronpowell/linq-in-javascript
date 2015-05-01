@@ -172,8 +172,12 @@ class Enumerable {
         return new SelectEnumerable(this, fn);
     }
 
+    map(fn) {
+        return this.select(fn);
+    }
+
     selectMany(fn = fnSelf) {
-        return new SelectManyEnumerable(fn);
+        return new SelectManyEnumerable(this, fn);
     }
 
     take(count = 0) {
@@ -284,13 +288,13 @@ class SelectManyEnumerable extends Enumerable {
     }
 
     next() {
-        var value = this;
+        var value = this.arr.next();
         if (value.done) {
             return value;
         }
         let arr = this.colSelector(value.value, this._index++);
         return {
-            value: resultSelector(arr, arr[i]),
+            value: this.resultSelector(arr, arr[0]),
             done: false
         };
     }
