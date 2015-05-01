@@ -367,6 +367,7 @@ class SkipEnumerable extends Enumerable {
         this.arr = arr;
         this.selector = selector;
         this.index = 0;
+        this.flag = false;
     }
 
     next() {
@@ -375,20 +376,22 @@ class SkipEnumerable extends Enumerable {
             return item;
         }
 
+        var i = this.index;
+        this.index++;
         if (typeof this.selector === 'number') {
-            var i = this.index;
-            this.index++;
             if (i >= this.selector) {
                 return item;
             } else {
                 return this.next();
             }
         } else {
-            if (this.selector(item.value, this.index)) {
-                return this.next();
-            } else {
+            if (!this.flag && !this.selector(item.value, i)) {
+                this.flag = true;
+            }
+            if (this.flag) {
                 return item;
             }
+            return this.next();
         }
     }
 }
