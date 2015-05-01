@@ -21,6 +21,20 @@ gulp.task('build', function () {
 
 gulp.task('tests', function () {
     require('./test-helpers/_helper');
+
+    var path = require('path');
+    var linqPath = path.join(__dirname, './test-helpers/_es6.js');
+    if (require.cache[linqPath]) {
+        console.log('removing helper path');
+        delete require.cache[linqPath];
+    }
+
+    linqPath = path.join(__dirname, './dist/linq.js');
+    if (require.cache[linqPath]) {
+        console.log('removing LINQ path');
+        delete require.cache[linqPath];
+    }
+
     require('./test-helpers/_es6');
     return gulp.src('./test/*.js', { read: false })
         .pipe(mocha());
