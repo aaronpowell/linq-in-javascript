@@ -49,10 +49,10 @@ class Enumerable {
         }
     }
 
-    single(seletor = fnTrue) {
+    single(selector = fnTrue) {
         var matched;
         for (let item of this) {
-            if (fn(item)) {
+            if (selector(item)) {
                 if (matched) {
                     throw Error('Sequence contains more than one matching element');
                 } else {
