@@ -149,8 +149,8 @@ class Enumerable {
         return new SelectEnumerable(this, fn);
     }
 
-    selectMany(fn = fnSelf) {
-        return new SelectManyEnumerable(this, fn);
+    selectMany(colSelector = fnSelf, resSelector) {
+        return new SelectManyEnumerable(this, colSelector, resSelector);
     }
 
     single(selector = fnTrue) {

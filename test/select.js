@@ -93,4 +93,12 @@ describe('.selectMany', function () {
 
         expect(results.toArray()).to.deep.equal([1,2,3]);
     });
+
+    it('should collapse a simple nested array and transform to new objects', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x, y => y * 2);
+
+        expect(results.toArray()).to.deep.equal([2,4,6]);
+    });
 });
