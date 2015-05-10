@@ -101,4 +101,20 @@ describe('.selectMany', function () {
 
         expect(results.toArray()).to.deep.equal([2,4,6]);
     });
+
+    it('should collapse an array containing enumerables', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x.asEnumerable().select(y => y + 1));
+
+        expect(results.toArray()).to.deep.equal([2,3,4]);
+    });
+
+    it('should collapse an array containing enumerables and transform to new objects', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x.asEnumerable().select(y => y + 1), z => z * 2);
+
+        expect(results.toArray()).to.deep.equal([4,6,8]);
+    });
 });
