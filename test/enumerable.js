@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('Enumerable', function () {
     describe('creation', function () {
         it('should allow creation from an existing array', function () {
@@ -9,7 +13,7 @@ describe('Enumerable', function () {
         });
 
         it('should allow creation without a constructor', function () {
-            var enumerable = Enumerable();
+            var enumerable = new Enumerable();
 
             expect(enumerable).to.exist;
         });
@@ -26,7 +30,7 @@ describe('Enumerable', function () {
             var range = Enumerable.range(1, 2);
 
             var index = 1;
-            for (var x of range()) {
+            for (var x of range) {
                 expect(x).to.equal(index);
                 index++;
             }

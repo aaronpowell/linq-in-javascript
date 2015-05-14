@@ -1,0 +1,1 @@
+global.Enumerable = require('../dist/linq');

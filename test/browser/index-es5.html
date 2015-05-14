@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8">
   <title>Mocha Tests</title>
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.css" />
+  <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
 </head>
 <body>
   <div id="mocha"></div>
   <script src="../../node_modules/mocha/mocha.js"></script>
+  <script src="../../node_modules/chai/chai.js"></script>
+  <script src="../../node_modules/babel-core/browser-polyfill.js"></script>
   <script>
     (function () {
         'use strict';
@@ -15,13 +17,26 @@
           var s = document.createElement('script');
           s.src = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.js';
           document.getElementsByTagName('head')[0].appendChild(s);
+
+          s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/chai/2.2.0/chai.min.js';
+          document.getElementsByTagName('head')[0].appendChild(s);
+
+          var l = document.createElement('link');
+          l.setAttribute('rel', 'stylesheet');
+          l.href = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.css';
+          document.getElementsByTagName('head')[0].appendChild(l);
         }
     })();
   </script>
-  <script src="chai.js"></script>
   <script>
     mocha.setup('bdd');
     var expect = chai.expect;
+
+    window.exports = {};
+    window.module = {
+        exports: window.exports
+    };
   </script>
 
   <script>
@@ -29,7 +44,7 @@
         'use strict';
 
         var scriptPaths = [
-            '../../src/linq.js',
+            '../../dist/linq-es5.js',
             '../enumerable.js',
             '../aggregate.js',
             '../average.js',

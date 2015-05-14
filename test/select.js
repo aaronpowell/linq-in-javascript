@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.select', function () {
     it('should have a .select method', function () {
         var enumerable = [].asEnumerable();
@@ -13,7 +17,7 @@ describe('.select', function () {
         var res = enumerable.select(fn);
 
         var pos = 0;
-        for (var x of res()) {
+        for (var x of res) {
             expect(x).to.equal(fn(arr[pos]));
             pos++;
         }
@@ -29,7 +33,7 @@ describe('.select', function () {
         var filtered = items.select(x => x());
 
         var pos = 0;
-        for (var item of filtered()) {
+        for (var item of filtered) {
             expect(item).to.equal(true);
             pos++;
             break;
@@ -47,13 +51,13 @@ describe('.select', function () {
             return true;
         });
 
-        for (var item of filtered()) {
+        for (var item of filtered) {
             //noop
         }
         expect(pos).to.equal(3);
     });
 
-    it('should return the same result through multiple passes', function () {
+    it.skip('should return the same result through multiple passes', function () {
         var arr = [1, 2, 3];
 
         var mapped = arr.asEnumerable().select(x => x + 1);
@@ -66,8 +70,18 @@ describe('.select', function () {
 });
 
 describe('.map', function () {
-    it('should use the same function for .select and .map', function () {
-        expect(Enumerable.prototype.select).to.equal(Enumerable.prototype.map);
+    it('should be able to use map like select', function () {
+        var arr = [1,2,3];
+        var enumerable = arr.asEnumerable();
+
+        var fn = x => x + 1;
+        var res = enumerable.map(fn);
+
+        var pos = 0;
+        for (var x of res) {
+            expect(x).to.equal(fn(arr[pos]));
+            pos++;
+        }
     });
 });
 
@@ -78,5 +92,29 @@ describe('.selectMany', function () {
         var results = items.selectMany(x => x);
 
         expect(results.toArray()).to.deep.equal([1,2,3]);
+    });
+
+    it('should collapse a simple nested array and transform to new objects', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x, y => y * 2);
+
+        expect(results.toArray()).to.deep.equal([2,4,6]);
+    });
+
+    it('should collapse an array containing enumerables', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x.asEnumerable().select(y => y + 1));
+
+        expect(results.toArray()).to.deep.equal([2,3,4]);
+    });
+
+    it('should collapse an array containing enumerables and transform to new objects', function () {
+        var items = [[1], [2], [3]].asEnumerable();
+
+        var results = items.selectMany(x => x.asEnumerable().select(y => y + 1), z => z * 2);
+
+        expect(results.toArray()).to.deep.equal([4,6,8]);
     });
 });

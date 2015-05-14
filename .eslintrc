@@ -1,0 +1,13 @@
+{
+    "envs": ["es6"],
+    "ecmaFeatures": {
+        "modules": true
+    },
+    "rules": {
+        "quotes": "single",
+        "strict": "global",
+        "global-strict": "global",
+        "no-extend-native": false,
+        "no-use-before-define": false
+    }
+}

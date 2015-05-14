@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.single', function () {
     it('should return the uniquely matched value', function () {
         var enumerable = [1, 2, 3].asEnumerable();

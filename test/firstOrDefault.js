@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.firstOrDefault', function () {
     it('should have a firstOrDefault method', function () {
         var items = [1, 2, 3].asEnumerable();

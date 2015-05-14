@@ -2,19 +2,27 @@
   "name": "linq-es6",
   "version": "0.2.1",
   "description": "An implementation of .NET's LINQ API in JavaScrpit using ES6 generators for lazy evaluation",
-  "keywords": ["linq"],
+  "keywords": [
+    "linq"
+  ],
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "mocha": "~1.12.0",
-    "chai": "~1.7.2"
+    "babel-core": "^5.1.13",
+    "chai": "^2.3.0",
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.1.0",
+    "gulp-eslint": "^0.11.1",
+    "gulp-mocha": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "mocha": "^2.2.4"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --require ./test-helpers/_helper.js --require ./test-helpers/_es6.js --harmony_arrow_functions"
   },
   "repository": {
     "type": "git",
@@ -25,7 +33,7 @@
   "bugs": {
     "url": "https://github.com/aaronpowell/linq-in-javascript/issues"
   },
-  "engines": [{
-    "node" : ">=0.11.4"
-  }]
+  "engines": {
+      "node": ">=0.11.4"
+    }
 }

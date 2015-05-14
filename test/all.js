@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.all', function () {
     it('should return true only if all values in the enumerable are true', function () {
         var enumerable = [true, true].asEnumerable();

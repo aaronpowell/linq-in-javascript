@@ -1,107 +1,40 @@
-(function (global) {
-    'use strict';
+'use strict';
 
-    var __extends = function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    };
+var fnTrue = () => true;
+var fnSelf = x => x;
 
-    var fnTrue = function () { return true; };
-    var fnSelf = function (x) { return x; };
+let parentSymbol = Symbol();
+let indexSymbol = Symbol();
+let colSymbol = Symbol();
+let selectorSymbol = Symbol();
+let countSymbol = Symbol();
+let startSymbol = Symbol();
 
-    var generator = function* (array) {
-        for (let i = 0; i < array.length; i++) {
-            yield array[i];
-        }
-    };
-
-    var Enumerable = function (array) {
-        if (this && this.constructor == Enumerable) {
-            throw 'This is not a constructable type, don\'t use the `new` operator';
-        }
-        var instance = generator.bind(this, array);
-
-        __extends(instance, generator);
-        return instance
-    };
-
-    var first = function (nullable, selector) {
-        return function (fn) {
-            fn = fn || selector;
-            for (let item of this()) {
-                if (fn(item)) {
-                    return item;
-                }
-            }
-
-            if (nullable) {
-                return undefined;
-            }
-            throw 'Sequence contains no matching elements';
-        };
-    };
-
-    var single = function (nullable, selector) {
-        return function (fn) {
-            fn = fn || selector;
-            var matched;
-            for (let item of this()) {
-                if (fn(item)) {
-                    if (matched) {
-                        throw 'Sequence contains more than one matching element';
-                    }
-                    else {
-                        matched = item;
-                    }
-                }
-            }
-
-            if (matched) {
-                return matched;
-            }
-
-            if (!matched && nullable) {
-                return undefined;
-            }
-
-            throw 'Sequence contains no matching elements';
-        };
-    };
-
-    var all = function (fn) {
-        for (let x of this()) {
-            if (!fn(x)) {
-                return false;
-            }
-        }
-
-        return true;
-    };
-
-    var any = function (fn) {
-        fn = fn || fnTrue;
-
-        for (let x of this()) {
-            if (fn(x)) {
-                return true;
-            }
-        }
-        return false;
+class Enumerable {
+    constructor(arr = []) {
+        this[parentSymbol] = arr;
+        this[indexSymbol] = 0;
     }
 
-    var count = function (fn) {
-        fn = fn || fnTrue;
+    [Symbol.iterator]() {
+        return this;
+    }
 
-        var count = 0;
-        for (var i of this()) {
-            if (fn(i)) {
-                count++;
-            }
+    next() {
+        if (this[indexSymbol] < this[parentSymbol].length) {
+            return {
+                value: this[parentSymbol][this[indexSymbol]++],
+                done: false
+            };
         }
-        return count;
-    };
 
-    var aggregate = function (seed, fn, selector) {
-        var it = this();
+        return {
+            done: true
+        };
+    }
+
+    aggregate(seed, fn, selector) {
+        var it = this;
 
         switch (arguments.length) {
             case 1:
@@ -125,15 +58,31 @@
             return selector(seed);
         }
         return seed;
-    };
+    }
 
-    var average = function (fn) {
+    all(fn = fnTrue) {
+        for (let x of this) {
+            if (!fn(x)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    any(fn = fnTrue) {
+        for (let x of this) {
+            if (fn(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    average(fn = fnSelf) {
         var total = 0;
         var count = 0;
 
-        fn = fn || fnSelf;
-
-        for (let item of this()) {
+        for (let item of this) {
             total += fn(item);
             count++;
         }
@@ -141,289 +90,346 @@
         if (count) {
             return total / count;
         }
-        throw Error('No items in the collection');
-    };
 
-    var concat = function (col) {
-        return ConcatEnumerable(this, col);;
-    };
+        throw Error('Sequence contains no elements');
+    }
 
-    var contains = function (value, tester) {
-        var it = this();
+    concat(col) {
+        return new ConcatEnumerable(this, col);
+    }
 
-        if (!tester) {
-            for (let item of it) {
-                if (item === value) {
-                    return true;
-                }
-            }
-        } else {
-            for (let item of it) {
-                if (tester(item, value)) {
-                    return true;
-                }
+    contains(value, tester = x => x === value) {
+        var it = this;
+
+        for (let item of it) {
+            if (tester(item, value)) {
+                return true;
             }
         }
         return false;
-    };
+    }
 
-    var where = function (fn) {
-        return WhereEnumerable(this, fn);
-    };
+    count(fn = fnTrue) {
+        var count = 0;
+        for (let i of this) {
+            if (fn(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
 
-    var select = function (fn) {
-        return SelectEnumerable(this, fn);
-    };
+    filter(selector) {
+        return this.where(selector);
+    }
 
-    var selectMany = function (fn) {
-        return SelectManyEnumerable(this, fn);
-    };
+    first(selector = fnTrue) {
+        for (let item of this) {
+            if (selector(item)) {
+                return item;
+            }
+        }
 
-    var take = function (count) {
-        return TakeEnumerable(this, count || 0);
-    };
+        throw new Error('Sequence contains no matching elements');
+    }
 
-    var takeWhile = function (fn) {
-        return TakeEnumerable(this, fn || 0);
-    };
+    firstOrDefault(selector = fnTrue) {
+        try {
+            return this.first(selector);
+        } catch (e) {
+            return undefined;
+        }
+    }
 
-    var skip = function (count) {
-        return SkipEnumerable(this, count || 0);
-    };
+    map(fn) {
+        return this.select(fn);
+    }
 
-    var skipWhile = function (fn) {
-        return SkipEnumerable(this, fn || 0);
-    };
+    select(fn = fnSelf) {
+        return new SelectEnumerable(this, fn);
+    }
 
-    var toArray = function() {
+    selectMany(colSelector = fnSelf, resSelector) {
+        return new SelectManyEnumerable(this, colSelector, resSelector);
+    }
+
+    single(selector = fnTrue) {
+        var matched;
+        for (let item of this) {
+            if (selector(item)) {
+                if (matched) {
+                    throw Error('Sequence contains more than one matching element');
+                } else {
+                    matched = item;
+                }
+            }
+        }
+        if (matched) {
+            return matched;
+        }
+
+        throw Error('Sequence contains no matching element');
+    }
+
+    singleOrDefault(selector = fnTrue) {
+        try {
+            return this.single(selector);
+        } catch (e) {
+            if (e.message === 'Sequence contains no matching element') {
+                return undefined;
+            }
+            throw e;
+        }
+    }
+
+    skip(count = 0) {
+        return new SkipEnumerable(this, count);
+    }
+
+    skipWhile(fn = 0) {
+        if (fn === 0) {
+            return this.skip();
+        }
+        return new SkipEnumerable(this, fn);
+    }
+
+    take(count = 0) {
+        return new TakeEnumerable(this, count);
+    }
+
+    takeWhile(fn = 0) {
+        if (fn === 0) {
+            return this.take();
+        }
+        return new TakeEnumerable(this, fn);
+    }
+
+    toArray() {
         var arr = [];
-        for (let i of this()) {
+        for (let i of this) {
             arr.push(i);
         }
         return arr;
-    };
-
-    generator.where = where;
-    generator.filter = where;
-
-    generator.select = select;
-    generator.map = select;
-    generator.selectMany = selectMany;
-
-    generator.first = first(false, fnTrue);
-    generator.firstOrDefault = first(true, fnTrue);
-
-    generator.single = single(false, fnTrue);
-    generator.singleOrDefault = single(true, fnTrue);
-
-    generator.all = all;
-    generator.any = any;
-    generator.count = count;
-    generator.aggregate = aggregate;
-    generator.average = average;
-    generator.concat = concat;
-    generator.contains = contains;
-
-    generator.take = take;
-    generator.takeWhile = takeWhile;
-
-    generator.skip = skip;
-    generator.skipWhile = skipWhile;
-
-    generator.toArray = toArray;
-
-    var ConcatEnumerable = (function (__super) {
-        return function (parent, col) {
-            if (col.constructor === Array) {
-                col = col.asEnumerable();
-            }
-
-            function* concat(col) {
-                for (let item of parent()) {
-                    yield item;
-                }
-
-                for (let item of col()) {
-                    yield item;
-                }
-            }
-
-            var x = concat.bind(this, col);
-            __extends(x, __super);
-            return x;
-        };
-    })(generator);
-
-    var WhereEnumerable = (function (__super) {
-        return function WhereEnumerable(parent, fn) {
-            function* where(fn) {
-                var index = 0;
-                for (let x of parent()) {
-                    if (fn(x, index)) {
-                        yield x;
-                    }
-                    index++;
-                }
-            }
-
-            var x = where.bind(this, fn);
-            __extends(x, __super);
-            return x;
-        };
-    })(generator);
-
-    var SelectEnumerable = (function (__super) {
-        return function (parent, fn) {
-            var selector = function* (parent, fn) {
-                var index = 0;
-                for (let item of parent()) {
-                    yield fn(item, index++);
-                }
-            };
-
-            var instance = selector.bind(this, parent, fn);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    var SelectManyEnumerable = (function (__super) {
-        return function (parent, colSelector, resultSelector) {
-            var selectMany = function* (parent, colSelector, resultSelector) {
-                resultSelector = resultSelector || function (col, x) { return x; };
-                var index = 0;
-
-                for (let item of parent()) {
-                    let arr = colSelector(item, index++);
-                    for (let i = 0; i < arr.length; i++) {
-                        let foo = resultSelector(arr, arr[i]);
-                        yield foo;
-                    }
-                }
-            };
-
-            var instance = selectMany.bind(this, parent, colSelector, resultSelector);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    var RangeEnumerable = (function (__super) {
-        return function (start, end) {
-            var ranger = function* (start, end) {
-                for (let i = 0; i < end; start++, i++) {
-                    yield start;
-                }
-            };
-
-            var instance = ranger.bind(this, start, end);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    var TakeEnumerable = (function (__super) {
-        return function (parent, selector) {
-            var taker = function* (parent, selector) {
-                var index = 0;
-                if (typeof selector === 'number') {
-                    for (let item of parent()) {
-                        if (index < selector) {
-                            yield item;
-                            index++;
-                        } else {
-                            break;
-                        }
-                    }
-                } else if (typeof selector === 'function') {
-                    for (let item of parent()) {
-                        if (selector(item, index)) {
-                            yield item;
-                        } else {
-                            break;
-                        }
-                        index++;
-                    }
-                }
-            };
-
-            var instance = taker.bind(this, parent, selector);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    var SkipEnumerable = (function (__super) {
-        return function (parent, selector) {
-            var skippy = function* (parent, selector) {
-                var index = 0;
-                if (typeof selector === 'number') {
-                    for (let item of parent()) {
-                        if (index >= selector) {
-                            yield item;
-                        }
-                        index++;
-                    }
-                } else if (typeof selector === 'function') {
-                    let flag = false;
-                    index = -1;
-                    for (let item of parent()) {
-                        index++;
-                        if (!flag && !selector(item, index)) {
-                            flag = true;
-                        }
-
-                        if (flag) {
-                            yield item;
-                        }
-                    }
-                }
-            };
-
-            var instance = skippy.bind(this, parent, selector);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    var RepeatEnumerable = (function (__super) {
-        return function (item, count) {
-            var repeater = function* (item, count) {
-                var stripped = JSON.stringify(item);
-                for (var i = 0; i < count; i++) {
-                    yield JSON.parse(stripped);
-                }
-            };
-
-            var instance = repeater.bind(this, item, count);
-            __extends(instance, __super);
-            return instance;
-        };
-    })(generator);
-
-    Enumerable.range = function (start, end) {
-        start = start || 0;
-        end = end || 0;
-
-        return RangeEnumerable(start, end);
-    };
-
-    Enumerable.repeat = function (item, count) {
-        return RepeatEnumerable(item, count || 0);
-    };
-
-    // extension methods
-    Array.prototype.asEnumerable = function() {
-        return Enumerable(this);
-    };
-
-    if (typeof module === 'object' && typeof module.exports === 'object') {
-        module.exports = Enumerable;
-    } else if (typeof define === 'function' && define.amd) {
-        define('linq', function () {
-            return Enumerable;
-        });
-    } else {
-        global.Enumerable = Enumerable;
     }
-})(this);
+
+    where(selector) {
+        return new WhereEnumerable(this, selector);
+    }
+
+    static range(start = 0, end = 0) {
+        return new RangeEnumerable(start, end);
+    }
+
+    static repeat(item, count = 0) {
+        return new RepeatEnumerable(item, count);
+    }
+}
+
+class ConcatEnumerable extends Enumerable {
+    constructor(arr, col) {
+        super();
+        this[parentSymbol] = arr;
+        this[colSymbol] = Array.isArray(col) ? col.asEnumerable() : col;
+    }
+
+    next() {
+        var value = this[parentSymbol].next();
+        if (!value.done) {
+            return value;
+        }
+
+        value = this[colSymbol].next();
+        return value;
+    }
+}
+
+class WhereEnumerable extends Enumerable {
+    constructor(arr, selector) {
+        super();
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
+    }
+
+    next() {
+        var val = this[parentSymbol].next();
+        if (val.done) {
+            return val;
+        }
+
+        if (this[selectorSymbol](val.value, this[indexSymbol]++)) {
+            return val;
+        }
+
+        return this.next();
+    }
+}
+
+class SelectEnumerable extends Enumerable {
+    constructor(arr, fn) {
+        super();
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = fn;
+        this[indexSymbol] = 0;
+    }
+
+    next() {
+        var value = this[parentSymbol].next();
+        if (value.done) {
+            return value;
+        }
+        return {
+            value: this[selectorSymbol](value.value, this[indexSymbol]++),
+            done: false
+        };
+    }
+}
+
+class SelectManyEnumerable extends Enumerable {
+    constructor(arr, colSelector, resultSelector) {
+        super();
+        this[parentSymbol] = arr;
+        this[colSymbol] = colSelector;
+        this[selectorSymbol] = resultSelector || ((_, x) => x);
+        this[indexSymbol] = 0;
+    }
+
+    next() {
+        var value = this[parentSymbol].next();
+        if (value.done) {
+            return value;
+        }
+        let arr = this[colSymbol](value.value, this[indexSymbol]++);
+        return {
+            value: this[selectorSymbol](arr, arr[0]),
+            done: false
+        };
+    }
+}
+
+class RangeEnumerable extends Enumerable {
+    constructor(start, count) {
+        super();
+        this[countSymbol] = count;
+        this[indexSymbol] = 0;
+        this[startSymbol] = start;
+    }
+
+    next() {
+        if (this[indexSymbol] === this[countSymbol]) {
+            return {
+                done: true
+            };
+        }
+
+        var value = this[startSymbol];
+        this[startSymbol]++;
+        this[indexSymbol]++;
+        return {
+            value: value,
+            done: false
+        };
+    }
+}
+
+class TakeEnumerable extends Enumerable {
+    constructor(arr, selector) {
+        super();
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
+    }
+
+    next() {
+        var item = this[parentSymbol].next();
+        if (item.done) {
+            return item;
+        }
+
+        if (typeof this[selectorSymbol] === 'number') {
+            if (this[indexSymbol] < this[selectorSymbol]) {
+                this[indexSymbol]++;
+                return item;
+            } else {
+                return {
+                    done: true
+                };
+            }
+        } else {
+            if (this[selectorSymbol](item.value, this[indexSymbol])) {
+                this[indexSymbol]++;
+                return item;
+            } else {
+                return {
+                    done: true
+                };
+            }
+        }
+    }
+}
+
+class SkipEnumerable extends Enumerable {
+    constructor(arr, selector) {
+        super();
+        this[parentSymbol] = arr;
+        this[selectorSymbol] = selector;
+        this[indexSymbol] = 0;
+        this[startSymbol] = false;
+    }
+
+    next() {
+        var item = this[parentSymbol].next();
+        if (item.done) {
+            return item;
+        }
+
+        var i = this[indexSymbol];
+        this[indexSymbol]++;
+        if (typeof this[selectorSymbol] === 'number') {
+            if (i >= this[selectorSymbol]) {
+                return item;
+            } else {
+                return this.next();
+            }
+        } else {
+            if (!this[startSymbol] && !this[selectorSymbol](item.value, i)) {
+                this[startSymbol] = true;
+            }
+            if (this[startSymbol]) {
+                return item;
+            }
+            return this.next();
+        }
+    }
+}
+
+class RepeatEnumerable extends Enumerable {
+    constructor(item, count) {
+        super();
+        this[selectorSymbol] = item;
+        this[countSymbol] = count;
+        this[indexSymbol] = 0;
+    }
+
+    next() {
+        if (this[indexSymbol] === this[countSymbol]) {
+            return {
+                done: true
+            };
+        }
+
+        var stripped = JSON.stringify(this[selectorSymbol]);
+        this[indexSymbol]++;
+        return {
+            value: JSON.parse(stripped),
+            done: false
+        };
+    }
+}
+
+// extension methods
+Array.prototype.asEnumerable = function() {
+    return new Enumerable(this);
+};
+
+export default Enumerable;

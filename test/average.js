@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.average', function () {
     it('should calculate the average', function () {
         var arr = Enumerable.range(0, 10);

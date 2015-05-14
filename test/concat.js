@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.concat', function () {
     it('should allow concatting two Enumerable objects', function () {
         var first = Enumerable.range(0, 10);

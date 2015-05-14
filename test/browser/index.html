@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="../../node_modules/mocha/mocha.js"></script>
+  <script>
+    (function () {
+        'use strict';
+        if (!window.mocha.setup) {
+          var s = document.createElement('script');
+          s.src = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.js';
+          document.getElementsByTagName('head')[0].appendChild(s);
+
+          s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/chai/2.2.0/chai.min.js';
+          document.getElementsByTagName('head')[0].appendChild(s);
+
+          var l = document.createElement('link');
+          l.setAttribute('rel', 'stylesheet');
+          l.href = '//cdnjs.cloudflare.com/ajax/libs/mocha/2.2.4/mocha.min.css';
+          document.getElementsByTagName('head')[0].appendChild(l);
+        }
+    })();
+  </script>
+  <script src="../../node_modules/chai/chai.js"></script>
+  <script>
+    mocha.setup('bdd');
+    var expect = chai.expect;
+
+    window.exports = {};
+    window.module = {
+        exports: window.exports
+    };
+  </script>
+
+  <script>
+    (function () {
+        'use strict';
+
+        var scriptPaths = [
+            '../../dist/linq.js',
+            '../enumerable.js',
+            '../aggregate.js',
+            '../average.js',
+            '../all.js',
+            '../any.js',
+            '../concat.js',
+            '../contains.js',
+            '../count.js',
+            '../first.js',
+            '../firstOrDefault.js',
+            '../select.js',
+            '../single.js',
+            '../singleOrDefault.js',
+            '../skip.js',
+            '../take.js',
+            '../where.js',
+            '../api-usages.js'
+        ];
+
+        var type;
+
+        var loadCount = 0;
+
+        try {
+          eval('let a = 1;');
+          return;
+        } catch (e) {
+            type = 'application/javascript;version=1.7';
+        }
+
+        scriptPaths.map(function (s) {
+            var el = document.createElement('script');
+            el.src = s;
+            if (type) {
+                el.setAttribute('type', type);
+            }
+
+            document.getElementsByTagName('head')[0].appendChild(el);
+
+            el.addEventListener('load', function () {
+                loadCount++;
+            });
+        });
+
+        setTimeout(function waiter() {
+            if (loadCount === scriptPaths.length) {
+                mocha.checkLeaks();
+                mocha.globals([]);
+                mocha.run();
+            } else {
+                setTimeout(waiter, 100);
+            }
+        }, 100);
+    })();
+  </script>
+</body>
+</html>

@@ -1,3 +1,7 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
 describe('.count', function () {
     it('should have a count method', function () {
         var enumerable = [].asEnumerable();

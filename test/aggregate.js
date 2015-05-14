@@ -1,3 +1,8 @@
+/* global Enumerable */
+/* global expect */
+/// <reference path="../typings/mocha/mocha.d.ts"/>
+'use strict';
+
 describe('.aggregate', function () {
     it('should aggregate a collection and return the final value', function () {
         var arr = Enumerable.range(0, 10);
