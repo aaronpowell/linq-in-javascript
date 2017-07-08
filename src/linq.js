@@ -141,6 +141,24 @@ class Enumerable {
         }
     }
 
+    last(selector = fnTrue) {
+        for (let item of this.reverse()) {
+            if (selector(item)) {
+                return item;
+            }
+        }
+
+        throw new Error('Sequence contains no matching elements');
+    }
+
+    lastOrDefault(selector = fnTrue) {
+        try {
+            return this.last(selector);
+        } catch (e) {
+            return undefined;
+        }
+    }
+
     map(fn) {
         return this.select(fn);
     }
