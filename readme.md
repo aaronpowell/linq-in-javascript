@@ -6,7 +6,7 @@ Although JavaScript arrays have querying capabilities through `map`, `reduce`, `
 
 ## Why LINQ?
 
-The advantage of LINQ is that it uses lazy execusion, each item goes through the whole _pipeline_ before the next item is processed. So if you have a large data set you can easily process subsets of the data and break early.
+The advantage of LINQ is that it uses lazy execution, each item goes through the whole _pipeline_ before the next item is processed. So if you have a large data set you can easily process subsets of the data and break early.
 
 ## How does it work?
 
