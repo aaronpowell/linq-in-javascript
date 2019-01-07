@@ -124,38 +124,34 @@ class Enumerable {
     }
 
     first(selector = fnTrue) {
+        var item = this.firstOrDefault(selector);
+        if(item)
+            return item;
+        
+        throw new Error('Sequence contains no matching elements');
+    }
+
+    firstOrDefault(selector = fnTrue) {
         for (let item of this) {
             if (selector(item)) {
                 return item;
             }
         }
-
-        throw new Error('Sequence contains no matching elements');
-    }
-
-    firstOrDefault(selector = fnTrue) {
-        try {
-            return this.first(selector);
-        } catch (e) {
-            return undefined;
-        }
     }
 
     last(selector = fnTrue) {
-        for (let item of this.reverse()) {
-            if (selector(item)) {
-                return item;
-            }
-        }
-
+        var item = this.lastOrDefault(selector);
+        if(item)
+            return item;
+        
         throw new Error('Sequence contains no matching elements');
     }
 
     lastOrDefault(selector = fnTrue) {
-        try {
-            return this.last(selector);
-        } catch (e) {
-            return undefined;
+        for (let item of this.reverse()) {
+            if (selector(item)) {
+                return item;
+            }
         }
     }
 
