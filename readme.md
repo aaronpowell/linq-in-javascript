@@ -14,13 +14,14 @@ To do this it leverages the [ES6 Iterators](http://wiki.ecmascript.org/doku.php?
 
 # Example
 
-    var items = [1, 2, 3, 4, 5, 6].asEnumerable();
+```javascript
+var items = [1, 2, 3, 4, 5, 6].asEnumerable();
 
-    for (let item in items.where(x => x % 2).select(x => x + 1))
-        console.log(item);
+for (let item in items.where(x => x % 2).select(x => x + 1))
+    console.log(item);
 
-    //output will be 2, 4, 6
-
+//output will be 2, 4, 6
+```
 # API
 
 The following LINQ methods are implemented:
